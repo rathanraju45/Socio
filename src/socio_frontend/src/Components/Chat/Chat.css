@@ -1,0 +1,284 @@
+/* Chat.css */
+
+.chat-page {
+    display: flex;
+    height: 100%;
+}
+
+#chat-list {
+    width: 25%;
+    border-right: 1px solid #ccc;
+    padding: 10px;
+}
+
+#chat-search {
+    width: 100%;
+    height: 5%;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.chat-search-bar {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #dbdbdb;
+    border-radius: 3px;
+}
+
+.chat-search-clear-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 10px;
+    cursor: pointer;
+}
+
+#chat-list-data {
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    width: 100%;
+}
+
+#chat-list-data::-webkit-scrollbar {
+    width: 5px;
+}
+
+#chat-list-data > div {
+    display: flex;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.chat-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.chat-details p {
+    margin: 0;
+}
+
+.chat-details p:first-child {
+    width: 80%;
+    font-weight: bold;
+}
+
+.preview-section {
+    width: 100%;
+    display: flex;
+}
+
+.chat-preview {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: grey !important
+}
+
+#chat-list img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+#chat-content {
+    width: 100%;
+    height: 100%;
+}
+
+#selected-chat {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-left: 1px solid #ccc;
+    padding: 10px;
+}
+
+#chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 5%;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+#chat-header > * {
+    cursor: pointer;
+}
+
+.back-arrow {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+#messages-section {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-item {
+    max-width: 60%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 20px;
+    position: relative;
+}
+
+.my-message {
+    background-color: #0095f6;
+    align-self: flex-end;
+}
+
+.other-message {
+    display: flex;
+    gap: 10px;
+    background-color: grey;
+    align-self: flex-start;
+    margin-left: 25px;
+}
+
+.message-sender-pic img {
+    position: absolute;
+    left: -35px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+#messages-section p {
+    margin: 0;
+}
+
+#messages-section span {
+    font-size: 0.8em;
+    color: #888888; /* Instagram timestamp color */
+}
+
+#chat-header img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+#selected-chat-details {
+    flex-grow: 1;
+}
+
+#selected-chat-status {
+    display: flex;
+    align-items: center;
+}
+
+.status-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.green {
+    background-color: green;
+}
+
+.grey {
+    background-color: grey;
+}
+
+#call-section {
+    display: flex;
+    gap: 10px;
+}
+
+#chat-input {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+#emoji-icon {
+    position: absolute;
+    cursor: pointer;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#chat-input input {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    padding-left: 40px;
+    padding-right: 70px;
+}
+
+#chat-input-icons {
+    display: flex;
+    gap: 10px;
+    right: 15px;
+    position: absolute;
+    cursor: pointer;
+}
+
+.no-selected-chat {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 20px;
+}
+
+@media screen and (max-width: 767px) {
+
+    #chat-list {
+        width: 100%;
+        padding: 5px;
+    }
+
+    #chat-list h1{
+        font-size: 30px;
+    }
+
+    #chat-list-data {
+        height: 87%;
+    }
+
+    #chat-content {
+        width: 100%;
+    }
+
+    #chat-header {
+        height: 8%;
+    }
+
+    #chat-search {
+        height: 6%;
+    }
+
+}
+
+@media screen and (min-width: 767px) and (max-width: 1024px){
+
+    #chat-list{
+        width: 100%;
+    }
+
+    #chat-content{
+        width: 100%;
+    }
+
+}

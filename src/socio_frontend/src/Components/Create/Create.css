@@ -1,0 +1,198 @@
+/* UploadModal.css */
+
+.upload-modal {
+    position: fixed;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    border: solid 1px white;
+    border-radius: 10px;
+
+    transform: rotateX(5deg) rotateY(5deg);
+}
+
+.upload-modal form{
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#darkBG .upload-modal{
+    box-shadow: 5px 5px 5px var(--socio-white);
+    background-color: var(--socio-black);
+}
+
+#lightBG .upload-modal{
+    box-shadow: 5px 5px 5px var(--socio-black);
+    background-color: var(--socio-white);
+}
+
+.close-button {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    border: none;
+    background-color: transparent;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.file-picker{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-picker > svg {
+    font-size: 100px;
+}
+
+.file-picker > input[type="file"] {
+    display: none;
+}
+
+.file-picker > label {
+    display: inline-block;
+    border-radius: 10px;
+    padding: 10px 20px;
+    background-color: var(--socio-blue);
+    color: white;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.file-preview{
+    flex-grow: 1;
+    border: solid 1px white;
+    align-items: center;
+    display: flex;
+}
+
+#file-preview-container{
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: solid 1px white;
+}
+
+#file-preview-container img{
+    width: 300px;
+    height: 300px;
+}
+
+#darkBG #file-preview-container img{
+    border: solid 1px var(--socio-white);
+}
+
+#lightBG #file-preview-container img{
+    border: solid 1px var(--socio-black);
+}
+
+#file-actions{
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#caption {
+    width: 100%;
+    height: 60%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+
+    vertical-align: top;
+    white-space: pre-wrap;
+}
+
+#create {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #0095f6;
+    border-radius: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+    border: none;
+    font-size: 16px;
+}
+
+@media screen and (max-width: 768px) {
+
+    .upload-modal {
+        top: 10%;
+        left: 0;
+        width: 100%;
+        height: 80%;
+    }
+
+    .file-preview{
+        flex-direction: column;
+    }
+
+    .file-picker > svg {
+        font-size: 50px;
+    }
+
+    #file-preview-container{
+        width: 100%;
+        height: 50%;
+    }
+
+    #file-actions{
+        width: 100%;
+        height: 50%;
+    }
+
+    #file-preview-container img{
+        width: 200px;
+        height: 200px;
+    }
+
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+
+    .upload-modal {
+        top: 10%;
+        left: 10%;
+        width: 80%;
+        height: 80%;
+    }
+
+    .file-preview{
+        flex-direction: column;
+    }
+
+    .file-picker > svg {
+        font-size: 50px;
+    }
+
+    #file-preview-container{
+        width: 100%;
+        height: 50%;
+    }
+
+    #file-actions{
+        width: 100%;
+        height: 50%;
+    }
+
+    #file-preview-container img{
+        width: 300px;
+        height: 300px;
+    }
+
+}

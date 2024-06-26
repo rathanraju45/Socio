@@ -1,0 +1,177 @@
+.mainSection {
+    width: 95%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    transition: width 0.3s ease;
+}
+
+.mainSection.mimimized {
+    width: 85%;
+    transition: width 0.3s ease;
+}
+
+.home-section{
+    height: 100%;
+    display: flex;
+}
+
+.home-main{
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: solid 0.1px lightgrey;
+    margin-top: 10px;
+}
+
+.stories-section {
+    width: 80%;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.stories-section::-webkit-scrollbar {
+    display: none;
+}
+
+.feed-section{
+    width: 80%;
+    height: calc(100% - 100px);
+    display: flex;
+    justify-content: center;
+}
+
+.profile-section{
+    width: 25%;
+}
+
+.profile-content{
+    display: flex;
+    align-items: center;
+    width: 95%;
+    height: 50px;
+    margin-top: 20px;
+}
+
+.profile-content > *{
+    cursor: pointer;
+}
+
+.profile-content img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 0 10px;
+}
+
+.profile-content span{
+    margin-left: auto;
+    color: var(--socio-blue) !important;
+    font-weight: bold;
+}
+
+.suggestions-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 95%;
+    height: 50px;
+}
+
+.suggestions-header > *{
+    cursor: pointer;
+}
+
+.suggestions-header h3{
+    margin-left: 10px;
+    color: grey !important;
+}
+
+.suggestions-header span{
+    font-weight: bold;
+    margin-left: auto;
+}
+
+.suggestion{
+    display: flex;
+    align-items: center;
+    width: 95%;
+    height: 50px;
+}
+
+.suggestion > *{
+    cursor: pointer;
+}
+
+.suggestion img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 0 10px;
+}
+
+.suggestion p{
+    font-size: 18px;
+}
+
+.suggestion span{
+    margin-left: auto;
+    color: var(--socio-blue) !important;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 767px){
+    .mainSection{
+        width: 100%;
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    .home-main{
+        width: 100%;
+        border-right: none;
+    }
+
+    .stories-section{
+        margin-top: 0;
+        width: 98%;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .profile-section{
+        display: none;
+    }
+
+    .feed-section{
+        width: 100%;
+    }
+
+}
+
+/* Tablet styles */
+@media screen and (min-width: 768px) and (max-width: 1024px){
+    .mainSection{
+        width: 90%;
+    }
+
+    .home-main{
+        width: 100%;
+    }
+
+    .stories-section{
+        width: 98%;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .profile-section{
+        display: none;
+    }
+    .feed-section{
+        width: 100%;
+    }
+}

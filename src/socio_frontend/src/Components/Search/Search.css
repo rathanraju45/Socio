@@ -1,0 +1,134 @@
+/* Search.css */
+
+.search-result-section {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    height: 100%;
+}
+
+.search-result-section h1{
+    margin-bottom: 20px;
+}
+
+.input-container {
+    position: relative;
+    width: 95%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.clear-search {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.search-result-section input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #dbdbdb;
+    border-radius: 3px;
+}
+
+.search-result-section button {
+    margin-bottom: 20px;
+}
+
+#recent-search-header{
+    display: flex;
+    justify-content: space-between;
+}
+
+#recent-search-header p {
+    cursor: pointer;
+    color: var(--socio-blue);
+}
+
+.recent-search-item{
+    font-size: 20px;
+    margin: 10px 0;
+}
+
+.recent-searches {
+    width: 95%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#no-recent,#no-results{
+    width: 95%;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+}
+
+/* Search.css */
+
+.search-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 95%;
+    overflow-y: scroll;
+}
+
+.search-result-account {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.remove-searched-result{
+    margin-left: auto;
+}
+
+.search-result-account img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 2px solid transparent;
+    background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, red, purple);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    box-decoration-break: clone;
+}
+
+.search-result-account p {
+    margin: 0;
+}
+
+.search-result-username{
+    font-size: 25px;
+}
+
+.search-result-displayname {
+    font-size: 15px;
+    color: grey !important;
+}
+
+/**
+ * Mobile styles
+ */
+@media screen and (max-width: 767px){
+
+    .search-result-section{
+        padding: 10px;
+    }
+
+    .search-result-section h1{
+        margin-bottom: 10px;
+    }
+}

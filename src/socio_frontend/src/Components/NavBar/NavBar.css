@@ -1,0 +1,12 @@
+.nav-bar {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 10px 0;
+    border-top: 1px solid #ddd;
+    flex-shrink: 0;
+}
+
+.nav-bar svg{
+    font-size: 20px;
+}

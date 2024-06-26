@@ -1,0 +1,65 @@
+#register-details{
+    position: absolute;
+    top: 50px;
+    left: 40%;
+}
+
+form{
+    width: 80%;
+    margin-left: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#profile-inputs img{
+    width: 300px;
+    border-radius: 50%;
+    border: 2px solid #333;
+}
+
+#update-profile-pic{
+    text-align: center;
+    color: red !important;
+}
+
+#text-inputs {
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    margin-left: 50px;
+}
+
+#text-inputs label{
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+}
+
+#text-inputs input,#text-inputs textarea{
+    width: 100%;
+    margin: 10px;
+    padding: 10px;
+    font-size: 20px;
+    border-radius: 5px;
+    border: solid 1px #333;
+}
+
+#text-inputs textarea{
+    height: 300px;
+}
+
+#Register-button{
+    width: 200px;
+    height: 50px;
+    border-radius: 10px;
+    background-color: #f1c40f;
+    font-size: 25px;
+    margin: auto;
+}
+
+.error-msg{
+    color: red !important;
+    font-size: 15px;
+    text-align: center;
+}

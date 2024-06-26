@@ -1,0 +1,51 @@
+/**
+ * This CSS file defines the global styles for the application.
+ * It uses the box-sizing property to include padding and border in an element's total width and height.
+ * It also sets the margin and padding of all elements to 0 to remove browser defaults.
+ * The `#root` id is used to style the root div of the application.
+ * The `body` tag is used to style the body of the HTML document.
+ * It also includes responsive styles for mobile and tablet devices using media queries.
+ *
+ * @module index.css
+ */
+
+/* Applying global styles to all elements */
+* {
+    box-sizing: border-box; /* Include padding and border in an element's total width and height */
+    margin: 0; /* Remove browser default margin */
+    padding: 0; /* Remove browser default padding */
+}
+
+html{
+    font-size: 16px;
+}
+
+/* Styling the root div of the application */
+#root{
+    height: 100%; /* Set the height to 100% of the parent element's height */
+    width: 100%; /* Set the width to 100% of the parent element's width */
+}
+
+/* Styling the body of the HTML document */
+body{
+    border: solid 1px ; /* Add a solid 1px border */
+    height: 100vh; /* Set the height to 100% of the viewport height */
+    width: 100vw; /* Set the width to 100% of the viewport width */
+    font-family: 'Roboto', sans-serif; /* Set the font family to Roboto */
+}
+
+/* Responsive Styles */
+
+/* Mobile styles */
+@media screen and (max-width: 767px){
+    body{
+        height: 100svh; /* Set the height to 100% of the viewport height for mobile devices */
+    }
+}
+
+/* Tablet styles */
+@media screen and (min-width: 768px) and (max-width: 1024px){
+    body{
+        height: 100svh; /* Set the height to 100% of the viewport height for tablet devices */
+    }
+}

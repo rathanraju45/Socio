@@ -1,0 +1,211 @@
+.post {
+    width: 100%;
+    max-width: 614px;
+    border: 0.1px solid lightgrey;
+    border-radius: 3px;
+    padding: 20px;
+    cursor: pointer;
+}
+
+.post-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.username {
+    margin: 0 10px; /* Add some margin to the username */
+}
+
+.post > img, .post > .video-container {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 10px;
+    position: relative;
+}
+
+.post > .video-container > video{
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.volume-button {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.pause-icon{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 40px;
+}
+
+.post-actions button {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 20px;
+}
+
+.follow-button {
+    background-color: #3897f0;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 14px;
+    margin-left: auto;
+}
+
+.profile-pic {
+    border: 3px solid transparent;
+    background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, red, purple);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    box-decoration-break: clone;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+.username-caption{
+    color: grey !important;
+}
+
+.see-more {
+    color: #3897f0 !important;
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.post-actions{
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.post-actions button {
+    background: none;
+    border: none;
+    color: #8e8e8e;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.save-icon{
+    margin-left: auto;
+}
+
+#darkBG .liked svg,#lightBG .liked svg,#darkBG .saved svg,#lightBG .saved svg{
+    color: #ED4956;
+}
+
+.comments-section {
+    padding: 10px;
+    border-top: 1px solid #ccc;
+}
+
+.comments-list{
+    height: 200px;
+    overflow-y: scroll;
+    border: solid 0.1px lightgrey;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.comments-section form {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.comments-section form input {
+    flex-grow: 1;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.comments-section form button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.comments-section .comment {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.comments-section .comment img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.comments-section .comment .username-comment {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+/* ... existing CSS ... */
+
+/* For mobile devices */
+@media (max-width: 767px) {
+
+    .post {
+        padding: 10px; /* Decrease the padding */
+    }
+
+    .post-header h3,
+    .caption .username-caption,
+    .caption .caption-text,
+    .comments-section .comment .username-comment,
+    .comments-section .comment .comment-text {
+        font-size: 16px; /* Decrease the font size */
+    }
+
+    .post-actions button,
+    .pause-icon {
+        font-size: 20px; /* Decrease the font size of the icons */
+    }
+}
+
+/* For tablet devices */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /*.post-header h3,*/
+    /*.caption .username-caption,*/
+    /*.caption .caption-text,*/
+    /*.comments-section .comment .username-comment,*/
+    /*.comments-section .comment .comment-text {*/
+    /*    font-size: 16px; !* Decrease the font size *!*/
+    /*}*/
+
+    /*.post-actions button,*/
+    /*.pause-icon {*/
+    /*    font-size: 18px; !* Decrease the font size of the icons *!*/
+    /*}*/
+}

@@ -1,0 +1,325 @@
+/* LandingPage.css */
+
+#main-heading,#about-us-text, #features-text, #Team, #credits h2 {
+  font-family: 'Playfair Display', serif;
+  font-weight: bold;
+}
+
+.landing-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  overflow-y: scroll;
+}
+
+.landing-page::-webkit-scrollbar {
+  display: none;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  width: 1200px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.navbar ul {
+  display: flex;
+  gap: 20px;
+}
+
+.navbar ul li {
+  list-style: none;
+}
+
+.navbar ul li a {
+  text-decoration: none;
+  color: white;
+  font-size: 20px;
+}
+
+.navbar ul li a:hover {
+  color: #f1c40f;
+}
+
+#sign-options{
+  display: flex;
+  gap: 20px;
+}
+
+#sign-options > button{
+  margin-top: 30px;
+  background-color: #f1c40f;
+  color: black !important;
+  border: none;
+  outline: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  width: 150px;
+  transition: transform 0.2s ease-in-out
+}
+
+#sign-options > button:hover{
+  transform: scale(1.1);
+}
+
+#watch-tutorial-icon{
+  color: black !important;
+}
+
+.middle-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 50px 0;
+}
+
+#main-heading{
+  font-size: 100px;
+  color: #f1c40f !important;
+}
+
+#tagline{
+  font-size: 50px;
+}
+
+.text-content {
+  width: 50%;
+}
+
+.illustration {
+  width: 50%;
+}
+
+.illustration img{
+  width: 100%;
+  object-fit: cover;
+}
+
+#About{
+  display: flex;
+}
+
+#about-us-text,#features-text{
+  text-align: center;
+  font-size: 50px;
+}
+
+#About .illustration{
+}
+
+#About .text-content{
+  font-size: 25px;
+  display: flex;
+}
+
+.features-section {
+  clear: bottom;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 50px 0;
+}
+
+.feature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.feature img{
+    width: 100px;
+}
+
+ul li img{
+  width: 120px;
+}
+
+.text-content-section {
+  padding: 50px 0;
+}
+
+.benefits-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 100px;
+}
+
+#Benefits h3{
+  font-size: 50px;
+}
+
+#Benefits h3 span{
+  color: #f1c40f;
+}
+
+.benefits-list li{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 25px;
+  margin-top: 40px;
+}
+
+.benefits-list li img{
+  width: 50px;
+}
+
+
+.founders-section {
+  padding: 50px 0;
+  text-align: center;
+}
+
+.founders-section h2{
+  font-size: 50px;
+}
+
+#team-details {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-top: 50px;
+}
+
+.team-member {
+  width: 150px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.team-member:hover {
+  transform: scale(1.1);
+}
+
+.team-member img {
+  width: 100%;
+  border-radius: 50%; /* Makes the image circular */
+  border: 2px solid #333; /* Adds a border around the image */
+}
+
+.team-member p {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+#credits h2{
+  font-size: 50px;
+  text-align: center;
+}
+
+#support-logos{
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 50px;
+}
+
+#support-logos img{
+  width: 45%;
+  cursor: pointer;
+}
+
+.footer {
+  padding: 20px 0;
+  text-align: center;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink-caret {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: orange; }
+}
+
+.typing-effect {
+  overflow: hidden;
+  white-space: nowrap;
+  animation:
+    typing 2s steps(30, end) forwards;
+}
+
+/* Existing styles... */
+
+/* Styles for screens with a maximum width of 768px (typical for tablets and mobile devices) */
+@media screen and (max-width: 768px) {
+  .landing-page {
+    padding: 10px;
+    width: 100%;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+    width: 100%;
+  }
+
+  .navbar ul {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .navbar ul li a {
+    font-size: 18px;
+  }
+
+  #sign-options > button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .middle-section,
+  #About,
+  .features-section,
+  .benefits-container,
+  #team-details {
+    flex-direction: column;
+  }
+
+  .text-content,
+  .illustration,
+  .feature,
+  .benefits-list li {
+    width: 100%;
+  }
+
+  #main-heading {
+    font-size: 50px;
+  }
+
+  #tagline,
+  #about-us-text,
+  #features-text,
+  #Team h2,
+  #credits h2,
+  #Benefits h3 {
+    font-size: 30px;
+  }
+
+  .text-content-section,
+  .founders-section {
+    padding: 20px 0;
+  }
+
+  .team-member {
+    width: 100px;
+  }
+
+  #support-logos img {
+    width: 100%;
+  }
+}

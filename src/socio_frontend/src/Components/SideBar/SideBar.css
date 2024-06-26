@@ -1,0 +1,130 @@
+/**
+ * @file
+ * This CSS file defines the styles for the `SideBar` component of the application.
+ * It uses CSS variables for the main colors and transitions.
+ * The `sidebar` class is used to style the main div of the `SideBar` component.
+ * The `sidebar.minimized` class is used to apply styles when the sidebar is minimized.
+ * The `icon` class is used to style the icons in the sidebar.
+ * The `icon.notifications` and `icon.chat` classes are used to style the notifications and chat icons respectively.
+ * The `notification-count` and `chat-count` classes are used to style the notification and chat counts respectively.
+ * The `new-notification` class is used to apply a shaking animation to the notification icon when there is a new notification.
+ * The `icon.more` class is used to style the more icon.
+ * The `more` class is used to style the more div.
+ * The `modal-content` class is used to style the modal content.
+ * The `modal-item` class is used to style the items in the modal.
+ * The `shake` keyframes are used to define the shaking animation.
+ */
+
+.sidebar {
+    width: 15%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    border-right: solid 0.1px lightgrey;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: width 0.3s ease;
+}
+
+.sidebar.minimized {
+    width: 5%;
+    transition: width 0.3s ease;
+    align-items: center;
+}
+
+.sidebar > .sidebar-logo{
+    width: 15vw;
+}
+
+.sidebar.minimized > .sidebar-logo {
+    width: 5vw;
+}
+
+.icon {
+    margin: 20px 0;
+    font-size: 25px;
+    color: #333; /* Change the color of the icon text */
+    display: flex; /* Use flexbox to align the icon and the text */
+    align-items: center; /* Vertically align the icon and the text */
+    cursor: pointer;
+}
+
+.icon svg {
+    margin-right: 15px; /* Add some space between the icon and the text */
+}
+
+.icon.notifications,.icon,.chat {
+    position: relative;
+    transition: transform 0.2s ease-in-out; /* Add this to smoothly animate the icon */
+}
+
+.notification-count,.chat-count {
+    background-color: #ff4500;
+    color: #fff;
+    border-radius: 50%;
+    padding: 2px 5px;
+    margin-left: 5px;
+    font-size: 10px;
+    position: absolute;
+    top: -10px;
+    left: -10px;
+}
+
+.new-notification {
+    animation: shake 0.5s ease-in-out infinite;
+}
+
+.icon.more {
+    margin-top: auto;
+}
+
+.more{
+    position: relative;
+}
+
+.modal-content {
+    position: absolute;
+    bottom: 25px;
+    left: 0;
+    border-radius: 5px;
+    padding: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    overflow: auto; /* Add a scrollbar if the content exceeds the height */
+    font-size: 20px;
+}
+
+.modal-item{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin: 10px auto;
+}
+
+.sidebar.minimized .modal-item > svg{
+    margin: 0;
+}
+
+@keyframes shake {
+    0% { transform: rotate(0deg); }
+    20% { transform: rotate(-10deg); }
+    40% { transform: rotate(10deg); }
+    60% { transform: rotate(-10deg); }
+    80% { transform: rotate(10deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Mobile styles */
+@media screen and (max-width: 767px){
+
+}
+
+/* Tablet styles */
+@media screen and (min-width: 768px) and (max-width: 1024px){
+    .sidebar{
+        width: 10% !important;
+    }
+}
