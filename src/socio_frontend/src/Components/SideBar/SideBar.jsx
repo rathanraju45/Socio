@@ -41,7 +41,6 @@ import {
     faCog
 } from '@fortawesome/free-solid-svg-icons';
 import {GlobalStore} from "../../store/GlobalStore.jsx";
-import Create from "../Create/Create.jsx";
 
 /**
  * The `SideBar` functional component.

@@ -154,7 +154,8 @@ export default function MainSection() {
                 }/>
                 <Route path="/chat" element={<Chat/>}/>
                 <Route path="/explore" element={<Explore/>}/>
-                <Route path="/profile" element={<Profile/>}/>
+                <Route path="/profile" element={<Profile typeOfProfile={"self"}/>}/>
+                <Route path={"/profile/:username"} element={<Profile typeOfProfile={"non-self"}/>}/>
             </Routes>
         </div>
     )

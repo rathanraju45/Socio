@@ -1,28 +1,51 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import './Create.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faImage, faMultiply} from "@fortawesome/free-solid-svg-icons";
+import {GlobalStore} from "../../store/GlobalStore.jsx";
+import useConvertToBinary from "../../hooks/useConverToBinary.js";
+import {v4 as uuidv4} from 'uuid';
 
 // eslint-disable-next-line react/prop-types
 export default function Create ({ isOpen, onClose }){
+
+    const {actor} = useContext(GlobalStore);
+    const {binary, convertToBinary} = useConvertToBinary();
+
     const [file, setFile] = useState(null);
+    const [binaryFile, setBinaryFile] = useState(null);
     const [caption, setCaption] = useState('');
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
+        convertToBinary(e.target.files[0]);
     };
 
     const handleCaptionChange = (e) => {
         setCaption(e.target.value);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Here you would typically send the file and caption to your server
-        // and save them in your database.
-        console.log(file, caption);
+        if(binaryFile && caption){
+            const fileId = uuidv4();
+            const uploadDate = new Date();
+            let submitRes = await actor.setPost(fileId, binaryFile, caption, uploadDate.toISOString());
+            alert(submitRes["ok"]);
+            if(submitRes["ok"]){
+                onClose();
+                setCaption('');
+                setFile(null);
+            }
+        }
     };
+
+    useEffect(() => {
+        if(binary !== null){
+            setBinaryFile(binary);
+        }
+    }, [binary]);
 
     if (!isOpen) {
         return null;

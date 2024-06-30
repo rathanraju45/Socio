@@ -34,9 +34,14 @@
 }
 
 .action-group > div {
-    padding: 5px;
-    background-color: var(--socio-blue);
-    border-radius: 10px;
+    background-color: #3897f0;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 14px;
+    margin-left: auto;
+    cursor: pointer;
 }
 
 #profile-top-container img {

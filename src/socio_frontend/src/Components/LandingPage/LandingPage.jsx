@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 import './LandingPage.css';
 import socio_logo from "../../../public/images/large_logos/black_theme_full.png";
 import socio_media_illustration from "../../../public/images/illustrations/Social media-amico.png";
@@ -23,10 +23,14 @@ import crewsphere from "../../../public/images/icp_images/crewshpere.png";
 import Login from "../Login/Login.jsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlay} from "@fortawesome/free-solid-svg-icons";
+import {GlobalStore} from "../../store/GlobalStore.jsx";
 
 const LandingPage = ({setLoading}) => {
 
+    const {setDarkMode} = useContext(GlobalStore);
+
     useEffect(() => {
+        setDarkMode(true);
         window.onload = function () {
             document.getElementById("tagline").classList.add("typing-effect");
         };

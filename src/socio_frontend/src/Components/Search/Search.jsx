@@ -1,24 +1,56 @@
 // eslint-disable-next-line no-unused-vars
-import React, {useEffect, useState} from 'react';
-import {accounts} from '../../Constants/accounts.js';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import './Search.css';
+import {GlobalStore} from "../../store/GlobalStore.jsx";
+
+import useConvertProfileImages from "../../hooks/useConverProfileImages.js";
+import {useNavigate} from "react-router-dom";
+import Loader from "../Loaders/Loader.jsx";
 
 export default function Search() {
+
+    const navigate = useNavigate();
+
+    const {actor} = useContext(GlobalStore);
+    const {updatedAccounts, convertAccounts} = useConvertProfileImages();
+
     const [searchTerm, setSearchTerm] = useState('');
+    const [searchTermLoading, setSearchTermLoading] = useState(false);
     const [filteredAccounts, setFilteredAccounts] = useState([]);
+    const [finalFilteredAccounts, setFinalFilteredAccounts] = useState([]);
     const [recentSearches, setRecentSearches] = useState([]);
 
+    // Define the function to filter accounts
+    const filterAccountsSetter = async () => {
+        return await actor.searchUsers(searchTerm);
+    };
+
     useEffect(() => {
+        setFilteredAccounts([]);
+        setFinalFilteredAccounts([]);
         if (searchTerm !== '') {
-            setFilteredAccounts(
-                accounts.filter(account => account.username.includes(searchTerm))
-            );
+            setSearchTermLoading(true);
+            filterAccountsSetter().then((response) => {
+                setFilteredAccounts(response);
+                setSearchTermLoading(false);
+            });
         } else {
             setFilteredAccounts([]);
+            setFinalFilteredAccounts([]);
         }
     }, [searchTerm]);
+
+    useEffect(() => {
+        if (filteredAccounts.length !== 0) {
+            convertAccounts(filteredAccounts);
+        }
+    }, [filteredAccounts]);
+
+    useEffect(() => {
+        setFinalFilteredAccounts(updatedAccounts);
+    }, [updatedAccounts]);
 
     const clearRecentSearch = () => {
         setRecentSearches([]);
@@ -49,13 +81,13 @@ export default function Search() {
                         recentSearches.length === 0 ? <h3 id={"no-recent"}>No recent searches</h3> :
                             recentSearches.map((search, index) => (
                                 <div key={index} className="search-result-account">
-                                    <img src={search.image} alt={search.username}/>
+                                    <img src={search[index].profilePicture} alt={search[index].username}/>
                                     <div className="search-result-account-details">
-                                        <p className={"search-result-username"}>{search.username}</p>
-                                        <p className={"search-result-displayname"}>{search.displayName}</p>
+                                        <p className={"search-result-username"}>{search[index].username}</p>
+                                        <p className={"search-result-displayname"}>{search[index].displayname}</p>
                                     </div>
                                     <span className={"remove-searched-result"}
-                                        onClick={() => setRecentSearches(recentSearches.filter(item => item !== search))}>
+                                          onClick={() => setRecentSearches(recentSearches.filter(item => item !== search))}>
                                         <FontAwesomeIcon icon={faTimes}/>
                                     </span>
                                 </div>
@@ -64,20 +96,22 @@ export default function Search() {
             ) : (
                 <div className="search-results">
                     {
-                        filteredAccounts.length === 0 ? <h3 id={"no-results"}>No results found</h3> :
-                        filteredAccounts.map((account, index) => (
-                        <div key={index} className="search-result-account" onClick={() => {
-                            if (!recentSearches.includes(account)) {
-                                setRecentSearches([...recentSearches, account]);
-                            }
-                        }}>
-                            <img src={account.image} alt={account.username}/>
-                            <div className="search-result-account-details">
-                                <p className={"search-result-username"}>{account.username}</p>
-                                <p className={"search-result-displayname"}>{account.displayName}</p>
-                            </div>
-                        </div>
-                    ))}
+                        searchTermLoading ? <Loader loading={"Searching"} />:
+                        finalFilteredAccounts.length === 0 ? <h3 id={"no-results"}>No results found</h3> :
+                            finalFilteredAccounts.map((account, index) => (
+                                <div key={index} className="search-result-account" onClick={() => {
+                                    if (!recentSearches.includes(account)) {
+                                        setRecentSearches([...recentSearches, account]);
+                                    }
+                                    navigate(`/profile/${account[index].username}`)
+                                }}>
+                                    <img src={account[index].profilePicture} alt={account[index].username}/>
+                                    <div className="search-result-account-details">
+                                        <p className={"search-result-username"}>{account[index].username}</p>
+                                        <p className={"search-result-displayname"}>{account[index].displayname}</p>
+                                    </div>
+                                </div>
+                            ))}
                 </div>
             )}
         </div>

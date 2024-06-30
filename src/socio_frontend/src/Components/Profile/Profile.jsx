@@ -8,16 +8,23 @@ import default_profile from "../../../public/images/illustrations/default_profil
 import {GlobalStore} from "../../store/GlobalStore.jsx";
 import useConvertToImage from "../../hooks/useConvertToImage.js";
 import Loader from "../Loaders/Loader.jsx";
+import useConvertPostsImages from "../../hooks/useConvertPostsImages.jsx";
+import {useParams} from "react-router-dom";
 
-export default function Profile() {
+export default function Profile({typeOfProfile}) {
+
+    const {username: profileUser} = useParams();
 
     const {deviceType, actor} = useContext(GlobalStore);
     const {image, convertToImage} = useConvertToImage();
+    const {image: postImage, convertToImage: convertPostImage} = useConvertToImage();
+    const {updatedPosts, conversionOfBlobs} = useConvertPostsImages();
 
     const [activeTab, setActiveTab] = useState("Posts");/* Mobile styles */
     const [profile, setProfile] = useState(null);
     const [postAddresses, setPostAddresses] = useState([]); // [address1, address2, address3, ...
     const [posts, setPosts] = useState(null);
+    const [finalPosts, setFinalPosts] = useState([]);
 
     const [profileLoading, setProfileLoading] = useState(false);
     const [postsLoading, setPostsLoading] = useState(false);
@@ -26,7 +33,11 @@ export default function Profile() {
         setProfileLoading(true);
 
         async function getProfile() {
-            return await actor.getUserDetails();
+            if (typeOfProfile === "self") {
+                return await actor.getUserDetails();
+            } else {
+                return await actor.getProfileDetails(profileUser);
+            }
         }
 
         getProfile().then(r => {
@@ -50,20 +61,30 @@ export default function Profile() {
             setPostsLoading(true);
             Promise.all(postAddresses.map(async (address) => {
                 const post = await actor.getPost(address);
-                return post;
+                return post["ok"];
             })).then(fetchedPosts => {
                 setPosts(fetchedPosts);
                 setPostsLoading(false);
             });
         }
     }, [postAddresses]);
-
+   
     useEffect(() => {
         setProfile(prevProfile => ({
             ...prevProfile,
             profilePicture: image
         }))
     }, [image]);
+
+    useEffect(() => {
+        if (!postsLoading && posts !== null) {
+            conversionOfBlobs(posts);
+        }
+    }, [posts]);
+
+    useEffect(() => {
+        setFinalPosts(updatedPosts);
+    }, [updatedPosts]);
 
     return (
 
@@ -83,20 +104,30 @@ export default function Profile() {
                         <div id="profile-actions">
                             <h1>{!profileLoading && profile !== null ? profile.username : "---"}</h1>
                             <div className="action-group">
-                                <div>Follow</div>
-                                <div>Message</div>
-                                <div>Edit profile</div>
+                                {typeOfProfile === "self" ? (
+                                    <div>Edit profile</div>
+                                ) : (
+                                            !profileLoading && profile && profile.username === profileUser ? <div>Edit profile</div> : (
+                                                <>
+                                                    <div onClick={() => {
+
+                                                    }}>Follow</div>
+                                                    <div>Message</div>
+                                                </>
+                                            )
+                                )}
                             </div>
                         </div>
 
                         <div id="profile-stats">
                             <div
-                                id="followers">{!profileLoading && profile !== null ? profile.followers : "--"} Followers
+                                id="followers">{!profileLoading && profile !== null ? profile.followers.toString() : "--"} Followers
                             </div>
                             <div
-                                id="following">{!profileLoading && profile !== null ? profile.following : "--"} Following
+                                id="following">{!profileLoading && profile !== null ? profile.following.toString() : "--"} Following
                             </div>
-                            <div id="posts">{!profileLoading && profile !== null ? profile.postsCount : "--"} Posts
+                            <div
+                                id="posts">{!profileLoading && profile !== null ? profile.postsCount.toString() : "--"} Posts
                             </div>
                         </div>
 
@@ -133,12 +164,13 @@ export default function Profile() {
                     <div id="stats-section">
                         <div id="profile-stats">
                             <div
-                                id="followers">{!profileLoading && profile !== null ? profile.followers : "--"} Followers
+                                id="followers">{!profileLoading && profile !== null ? profile.followers.toString() : "--"} Followers
                             </div>
                             <div
-                                id="following">{!profileLoading && profile !== null ? profile.following : "--"} Following
+                                id="following">{!profileLoading && profile !== null ? profile.following.toString() : "--"} Following
                             </div>
-                            <div id="posts">{!profileLoading && profile !== null ? profile.postsCount : "--"} Posts
+                            <div
+                                id="posts">{!profileLoading && profile !== null ? profile.postsCount.toString() : "--"} Posts
                             </div>
                         </div>
 
@@ -201,8 +233,8 @@ export default function Profile() {
                     {
                         !postsLoading ?
                             (
-                                posts !== null ?
-                                    posts.map((post, index) => {
+                                finalPosts.length !== 0 ?
+                                    finalPosts.map((post, index) => {
                                         return (
                                             <div key={index} className="profile-post">
                                                 <img src={post.img} alt="Post"/>
@@ -210,11 +242,11 @@ export default function Profile() {
                                         )
                                     })
                                     : <div id={"no-posts"}>
-                                        <FontAwesomeIcon icon={faImage} />
+                                        <FontAwesomeIcon icon={faImage}/>
                                         <p>No posts</p>
                                     </div>
                             )
-                            : <Loader loading={"Loading Posts"} />
+                            : <Loader loading={"Loading Posts"}/>
                     }
                 </div>
 

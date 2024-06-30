@@ -83,7 +83,7 @@ export const GlobalStoreProvider = ({children}) => {
     // Return the provider element for the global store.
     return (
         <GlobalStore.Provider
-            value={{darkMode, toggleDarkMode, sideBarMinimized, toggleSideBar, deviceType, updateDeviceType, loggedIn, setLoggedIn, identity, setIdentity, actor, setActor, userDetails, setUserDetails}}>
+            value={{darkMode, toggleDarkMode, setDarkMode, sideBarMinimized, toggleSideBar, deviceType, updateDeviceType, loggedIn, setLoggedIn, identity, setIdentity, actor, setActor, userDetails, setUserDetails}}>
             {
                 children
             }

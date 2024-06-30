@@ -14,7 +14,7 @@
  */
 
 // eslint-disable-next-line no-unused-vars
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {useLocation} from "react-router-dom";
 import {GlobalStore} from "./store/GlobalStore.jsx"; // Importing the GlobalStore to access the application state
 
@@ -43,6 +43,8 @@ export default function App() {
 
     const [loading, setLoading] = useState(null);
     const [loadingUserDetails, setLoadingUserDetails] = useState(null);
+
+    const miscellaneousRef = useRef(null);
 
     // Accessing the dark mode and device type from store.
     const {
@@ -104,6 +106,23 @@ export default function App() {
         }
     }, [identity]);
 
+    useEffect(() => {
+    const handleClickOutside = (event) => {
+        if (isMiscellaneousOpen && !miscellaneousRef.current.contains(event.target)) {
+            setIsMiscellaneousOpen(false);
+            toggleSideBar(false);
+        }
+    };
+
+    // Listen for click events on the document
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+    };
+}, [isMiscellaneousOpen]);
+
     return (
         <div className="App" id={darkMode ? "darkBG" : "lightBG"}>
 
@@ -129,7 +148,7 @@ export default function App() {
                                                  miscellaneous={setIsMiscellaneousOpen}
                                                  miscellaneousType={setMiscellaneousType}/>}
                                     <MainSection/>
-                                    <div id="miscellaneous"
+                                    <div id="miscellaneous" ref={miscellaneousRef}
                                          className={miscellaneousType !== '' && isMiscellaneousOpen ? "miscellaneous-open" : "miscellaneous-close"}
                                          style={{
                                              backgroundColor: darkMode ? 'rgb(0,0,0)' : 'rgb(245,245,245)',

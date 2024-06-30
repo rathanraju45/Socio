@@ -27,7 +27,7 @@ export default function Login({setLoading}) {
             // Local url for providing internet identity only in chrome.
             setII_URL(`http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`);
         } else if (process.env.DFX_NETWORK === "ic") {
-            setII_URL(`https://${process.env.CANISTER_ID_INTERNET_IDENTITY}.ic0.app`);
+            setII_URL("https://identity.ic0.app");
         } else {
             setII_URL(`https://${process.env.CANISTER_ID_INTERNET_IDENTITY}.dfinity.network`);
         }

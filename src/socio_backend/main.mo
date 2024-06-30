@@ -4,6 +4,8 @@ import Iter "mo:base/Iter";
 import HashMap "mo:base/HashMap";
 import Result "mo:base/Result";
 import Blob "mo:base/Blob";
+import Array "mo:base/Array";
+import Bool "mo:base/Bool";
 import storage "canister:socio_storage";
 
 actor {
@@ -16,10 +18,19 @@ actor {
         followers : Nat;
         following : Nat;
         postsCount : Nat;
-        posts : [Blob];
-        reels : [Blob];
-        tagged : [Blob];
-        saved : [Blob];
+        followerList : [Text];
+        followingList : [Text];
+        friendRequests : [Text];
+        posts : [Text];
+        reels : [Text];
+        tagged : [Text];
+        saved : [Text];
+    };
+
+    type UserBasicDetails = {
+        username : Text;
+        displayname : Text;
+        profilePicture : Blob;
     };
 
     type Result<Ok, Err> = {
@@ -38,7 +49,6 @@ actor {
         caption : Text;
         date : Text;
     };
-    
 
     type Users = HashMap.HashMap<Principal, UserDetails>;
 
@@ -104,8 +114,79 @@ actor {
         };
     };
 
+    public func getProfileDetails(username : Text) : async Result<UserDetails,Text> {
+        switch (usernames.get(username)) {
+            case null {
+                return #err("User does not exist.");
+            };
+            case (?principal) {
+                switch (users.get(principal)) {
+                    case null {
+                        return #err("User does not exist.");
+                    };
+                    case (?userDetails) {
+                        return #ok(userDetails);
+                    };
+                };
+            };
+        };
+    };
+
     public func usernameAvailablity(username : Text) : async Bool {
         return usernames.get(username) == null;
+    };
+
+    public func searchUsers(searchTerm : Text) : async [?UserBasicDetails] {
+        let userNames : [Text] = Iter.toArray(usernames.keys());
+        let matchedUsers : [Text] = Array.filter(
+            userNames,
+            func(username : Text) : Bool {
+                Text.contains(username, #text searchTerm);
+            },
+        );
+
+        let matchedPrincipals : [?Text] = Array.map(
+            matchedUsers,
+            func(username : Text) : ?Text {
+                let res = usernames.get(username);
+                switch (res) {
+                    case (?principal) {
+                        return ?Principal.toText(principal);
+                    };
+                    case (_) {
+                        return null;
+                    };
+                };
+            },
+        );
+
+        let matchedUserDetails : [?UserBasicDetails] = Array.map(
+            matchedPrincipals,
+            func(principal : ?Text) : ?UserBasicDetails {
+                switch (principal) {
+                    case (?principal) {
+                        switch (users.get(Principal.fromText(principal))) {
+                            case (?userDetails) {
+                                return ?{
+                                    principal = Principal.fromText(principal);
+                                    username = userDetails.username;
+                                    displayname = userDetails.displayname;
+                                    profilePicture = userDetails.profilePicture;
+                                };
+                            };
+                            case (_) {
+                                return null;
+                            };
+                        };
+                    };
+                    case (_) {
+                        return null;
+                    };
+                };
+            },
+        );
+
+        return matchedUserDetails;
     };
 
     public func deleteUser() : async Result<Text, Text> {
@@ -143,9 +224,45 @@ actor {
         };
     };
 
-    public func setPost(id: Text, img : Blob, caption : Text, date : Text) : async Result<Text, Text> {
-        let res = await storage.addPost(id, img, caption, date);
-        return #ok(res);
+    public func setPost(id : Text, img : Blob, caption : Text, date : Text) : async Result<Text, Text> {
+        let res = await storage.addPost(id, img, caption, date, Principal.toText(await whoami()));
+        switch (res) {
+            case (#ok("Post added successfully!")) {
+                let user = users.get(await whoami());
+                switch (user) {
+                    case (?user) {
+                        let updatedUser = {
+                            username = user.username;
+                            displayname = user.displayname;
+                            profilePicture = user.profilePicture;
+                            bio = user.bio;
+                            followers = user.followers;
+                            following = user.following;
+                            postsCount = user.postsCount + 1;
+                            followerList = user.followerList;
+                            followingList = user.followingList;
+                            friendRequests = user.friendRequests;
+                            posts = Array.append(user.posts, [id]);
+                            reels = user.reels;
+                            tagged = user.tagged;
+                            saved = user.saved;
+                        };
+                        let _ = users.put(await whoami(), updatedUser);
+                    };
+                    case (_) {
+                        return #err("Error adding post");
+                    };
+                };
+
+                return #ok("Post added successfully!");
+            };
+            case (#err("Error adding post")) {
+                return #err("Error adding post");
+            };
+            case (_) {
+                return #err("Unexpected Error.");
+            };
+        };
     };
 
     public func getVideo(id : Text) : async Result<Video, Text> {
@@ -160,9 +277,44 @@ actor {
         };
     };
 
-    public func setVideo(id: Text, video : Blob, caption : Text, date : Text) : async Result<Text, Text> {
-        let res = await storage.addVideo(id, video, caption, date);
-        return #ok(res);
+    public func setVideo(id : Text, video : Blob, caption : Text, date : Text) : async Result<Text, Text> {
+        let res = await storage.addVideo(id, video, caption, date, Principal.toText(await whoami()));
+        switch (res) {
+            case (#ok("Video added successfully!")) {
+                let user = users.get(await whoami());
+                switch (user) {
+                    case (?user) {
+                        let updatedUser = {
+                            username = user.username;
+                            displayname = user.displayname;
+                            profilePicture = user.profilePicture;
+                            bio = user.bio;
+                            followers = user.followers;
+                            following = user.following;
+                            postsCount = user.postsCount + 1;
+                            followerList = user.followerList;
+                            followingList = user.followingList;
+                            friendRequests = user.friendRequests;
+                            posts = Array.append(user.posts, [id]);
+                            reels = user.reels;
+                            tagged = user.tagged;
+                            saved = user.saved;
+                        };
+                        let _ = users.put(await whoami(), updatedUser);
+                    };
+                    case (_) {
+                        return #err("Error adding video");
+                    };
+                };
+                return #ok("Video added successfully!");
+            };
+            case (#err("Error adding video")) {
+                return #err("Error adding video");
+            };
+            case (_) {
+                return #err("Unexpected Error.");
+            };
+        };
     };
 
 };
