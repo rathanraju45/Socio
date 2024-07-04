@@ -21,6 +21,7 @@ export const GlobalStoreProvider = ({children}) => {
     const [actor, setActor] = useState(null);
     const [identity, setIdentity] = useState(null);
     const [userDetails, setUserDetails] = useState(null);
+    const [alert, setAlert] = useState(null);
 
     /**
      * darkMode - The state variable for the dark mode setting.
@@ -83,7 +84,7 @@ export const GlobalStoreProvider = ({children}) => {
     // Return the provider element for the global store.
     return (
         <GlobalStore.Provider
-            value={{darkMode, toggleDarkMode, setDarkMode, sideBarMinimized, toggleSideBar, deviceType, updateDeviceType, loggedIn, setLoggedIn, identity, setIdentity, actor, setActor, userDetails, setUserDetails}}>
+            value={{alert, setAlert, darkMode, toggleDarkMode, setDarkMode, sideBarMinimized, toggleSideBar, deviceType, updateDeviceType, loggedIn, setLoggedIn, identity, setIdentity, actor, setActor, userDetails, setUserDetails}}>
             {
                 children
             }

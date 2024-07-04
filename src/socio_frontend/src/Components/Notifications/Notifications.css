@@ -20,6 +20,7 @@
     display: flex;
     align-items: center;
     padding: 10px 0;
+    cursor: pointer;
 }
 
 .avatar {
@@ -27,6 +28,11 @@
     height: 50px;
     border-radius: 50%;
     margin-right: 10px;
+    border: 3px solid transparent;
+    background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, red, purple);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
 }
 
 .notification-text {

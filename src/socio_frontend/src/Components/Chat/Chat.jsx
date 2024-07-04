@@ -23,6 +23,7 @@ import {
     faVideo
 } from "@fortawesome/free-solid-svg-icons";
 import {GlobalStore} from "../../store/GlobalStore.jsx";
+import {useParams} from "react-router-dom";
 
 /**
  * The main Chat component
@@ -194,8 +195,7 @@ export default function Chat() {
                                 <div id="selected-chat-details">
                                     <p>{selectedChat.name}</p>
                                     <span id="selected-chat-status">
-                                        {selectedChat.status !== 'typing' && <span
-                                            className={`status-circle ${selectedChat.status === 'Online' ? "green" : "grey"}`}/>}
+                                        {selectedChat.status !== 'typing' && <span className={`status-circle ${selectedChat.status === 'Online' ? "green" : "grey"}`}/>}
                                         <p>{selectedChat.status}</p>
                                     </span>
                                 </div>

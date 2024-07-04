@@ -33,7 +33,9 @@ export default function Search() {
         if (searchTerm !== '') {
             setSearchTermLoading(true);
             filterAccountsSetter().then((response) => {
-                setFilteredAccounts(response);
+                if(response.length !== 0) {
+                    setFilteredAccounts(response);
+                }
                 setSearchTermLoading(false);
             });
         } else {
@@ -81,10 +83,10 @@ export default function Search() {
                         recentSearches.length === 0 ? <h3 id={"no-recent"}>No recent searches</h3> :
                             recentSearches.map((search, index) => (
                                 <div key={index} className="search-result-account">
-                                    <img src={search[index].profilePicture} alt={search[index].username}/>
+                                    <img src={search[index].profilePicture} alt={search[0].username}/>
                                     <div className="search-result-account-details">
-                                        <p className={"search-result-username"}>{search[index].username}</p>
-                                        <p className={"search-result-displayname"}>{search[index].displayname}</p>
+                                        <p className={"search-result-username"}>{search[0].username}</p>
+                                        <p className={"search-result-displayname"}>{search[0].displayname}</p>
                                     </div>
                                     <span className={"remove-searched-result"}
                                           onClick={() => setRecentSearches(recentSearches.filter(item => item !== search))}>
@@ -103,12 +105,12 @@ export default function Search() {
                                     if (!recentSearches.includes(account)) {
                                         setRecentSearches([...recentSearches, account]);
                                     }
-                                    navigate(`/profile/${account[index].username}`)
+                                    navigate(`/profile/${account[0].username}`)
                                 }}>
-                                    <img src={account[index].profilePicture} alt={account[index].username}/>
+                                    <img src={account[0].profilePicture} alt={account[0].username}/>
                                     <div className="search-result-account-details">
-                                        <p className={"search-result-username"}>{account[index].username}</p>
-                                        <p className={"search-result-displayname"}>{account[index].displayname}</p>
+                                        <p className={"search-result-username"}>{account[0].username}</p>
+                                        <p className={"search-result-displayname"}>{account[0].displayname}</p>
                                     </div>
                                 </div>
                             ))}
@@ -116,4 +118,5 @@ export default function Search() {
             )}
         </div>
     );
+
 }

@@ -7,8 +7,17 @@ import Blob "mo:base/Blob";
 import Array "mo:base/Array";
 import Bool "mo:base/Bool";
 import storage "canister:socio_storage";
+import messages "canister:socio_messages_storage";
 
 actor {
+
+    type Notification = {
+        notificationType : Text;
+        message : Text;
+        addresses : Text;
+        date : Text;
+        from : Text;
+    };
 
     type UserDetails = {
         username : Text;
@@ -25,12 +34,29 @@ actor {
         reels : [Text];
         tagged : [Text];
         saved : [Text];
+        notifications : [Notification];
+        chatIds : [Text];
     };
 
     type UserBasicDetails = {
         username : Text;
         displayname : Text;
         profilePicture : Blob;
+    };
+
+    type PublicProfileDetails = {
+        username : Text;
+        displayname : Text;
+        profilePicture : Blob;
+        bio : Text;
+        followers : Nat;
+        following : Nat;
+        postsCount : Nat;
+        followerList : [Text];
+        followingList : [Text];
+        posts : [Text];
+        reels : [Text];
+        tagged : [Text];
     };
 
     type Result<Ok, Err> = {
@@ -50,7 +76,16 @@ actor {
         date : Text;
     };
 
-    type Users = HashMap.HashMap<Principal, UserDetails>;
+    type Message = {
+        sender : Text;
+        message : Text;
+        media : Blob;
+        date : Text;
+    };
+
+    type UserChats = {
+        messages : [Message];
+    };
 
     private var users : HashMap.HashMap<Principal, UserDetails> = HashMap.HashMap<Principal, UserDetails>(10, Principal.equal, Principal.hash);
     private stable var upgradeUsers : [(Principal, UserDetails)] = [];
@@ -75,8 +110,8 @@ actor {
         return msg.caller;
     };
 
-    public func registerUser(userDetails : UserDetails) : async Result<Text, Text> {
-        let caller = await whoami();
+    public shared (msg) func registerUser(userDetails : UserDetails) : async Result<Text, Text> {
+        let caller = msg.caller;
         switch (usernames.get(userDetails.username)) {
             case null {
                 usernames.put(userDetails.username, caller);
@@ -89,8 +124,8 @@ actor {
         };
     };
 
-    public func updateUserDetails(userDetails : UserDetails) : async Result<Text, Text> {
-        let caller = await whoami();
+    public shared (msg) func updateUserDetails(userDetails : UserDetails) : async Result<Text, Text> {
+        let caller = msg.caller;
         switch (users.get(caller)) {
             case null {
                 return #err("User does not exist.");
@@ -102,8 +137,8 @@ actor {
         };
     };
 
-    public func getUserDetails() : async Result<UserDetails, Text> {
-        let caller = await whoami();
+    public shared (msg) func getUserDetails() : async Result<UserDetails, Text> {
+        let caller = msg.caller;
         switch (users.get(caller)) {
             case null {
                 return #err("User does not exist.");
@@ -114,7 +149,7 @@ actor {
         };
     };
 
-    public func getProfileDetails(username : Text) : async Result<UserDetails,Text> {
+    public func getProfileDetails(username : Text) : async Result<PublicProfileDetails, Text> {
         switch (usernames.get(username)) {
             case null {
                 return #err("User does not exist.");
@@ -125,7 +160,21 @@ actor {
                         return #err("User does not exist.");
                     };
                     case (?userDetails) {
-                        return #ok(userDetails);
+                        let profileDetails = {
+                            username = userDetails.username;
+                            displayname = userDetails.displayname;
+                            profilePicture = userDetails.profilePicture;
+                            bio = userDetails.bio;
+                            followers = userDetails.followers;
+                            following = userDetails.following;
+                            postsCount = userDetails.postsCount;
+                            followerList = userDetails.followerList;
+                            followingList = userDetails.followingList;
+                            posts = userDetails.posts;
+                            reels = userDetails.reels;
+                            tagged = userDetails.tagged;
+                        };
+                        return #ok(profileDetails);
                     };
                 };
             };
@@ -168,7 +217,6 @@ actor {
                         switch (users.get(Principal.fromText(principal))) {
                             case (?userDetails) {
                                 return ?{
-                                    principal = Principal.fromText(principal);
                                     username = userDetails.username;
                                     displayname = userDetails.displayname;
                                     profilePicture = userDetails.profilePicture;
@@ -189,8 +237,8 @@ actor {
         return matchedUserDetails;
     };
 
-    public func deleteUser() : async Result<Text, Text> {
-        let caller = await whoami();
+    public shared (msg) func deleteUser() : async Result<Text, Text> {
+        let caller = msg.caller;
         switch (users.get(caller)) {
             case null {
                 return #err("User does not exist.");
@@ -224,11 +272,12 @@ actor {
         };
     };
 
-    public func setPost(id : Text, img : Blob, caption : Text, date : Text) : async Result<Text, Text> {
-        let res = await storage.addPost(id, img, caption, date, Principal.toText(await whoami()));
+    public shared (msg) func setPost(id : Text, img : Blob, caption : Text, date : Text) : async Result<Text, Text> {
+        let caller = msg.caller;
+        let res = await storage.addPost(id, img, caption, date, caller);
         switch (res) {
-            case (#ok("Post added successfully!")) {
-                let user = users.get(await whoami());
+            case (#ok("Post added to storage")) {
+                let user = users.get(caller);
                 switch (user) {
                     case (?user) {
                         let updatedUser = {
@@ -246,18 +295,19 @@ actor {
                             reels = user.reels;
                             tagged = user.tagged;
                             saved = user.saved;
+                            notifications = user.notifications;
+                            chatIds = user.chatIds;
                         };
                         let _ = users.put(await whoami(), updatedUser);
+                        return #ok("Post added successfully!");
                     };
                     case (_) {
-                        return #err("Error adding post");
+                        return #err("Error updating user with the uploaded post");
                     };
                 };
-
-                return #ok("Post added successfully!");
             };
-            case (#err("Error adding post")) {
-                return #err("Error adding post");
+            case (#err("Error adding post to storage")) {
+                return #err("Error adding post to storage");
             };
             case (_) {
                 return #err("Unexpected Error.");
@@ -277,11 +327,12 @@ actor {
         };
     };
 
-    public func setVideo(id : Text, video : Blob, caption : Text, date : Text) : async Result<Text, Text> {
-        let res = await storage.addVideo(id, video, caption, date, Principal.toText(await whoami()));
+    public shared (msg) func setVideo(id : Text, video : Blob, caption : Text, date : Text) : async Result<Text, Text> {
+        let caller = msg.caller;
+        let res = await storage.addVideo(id, video, caption, date, caller);
         switch (res) {
-            case (#ok("Video added successfully!")) {
-                let user = users.get(await whoami());
+            case (#ok("Video added to storage")) {
+                let user = users.get(caller);
                 switch (user) {
                     case (?user) {
                         let updatedUser = {
@@ -299,20 +350,291 @@ actor {
                             reels = user.reels;
                             tagged = user.tagged;
                             saved = user.saved;
+                            notifications = user.notifications;
+                            chatIds = user.chatIds;
                         };
                         let _ = users.put(await whoami(), updatedUser);
+                        return #ok("Video added successfully!");
                     };
                     case (_) {
-                        return #err("Error adding video");
+                        return #err("Error updating user with uploaded video");
                     };
                 };
-                return #ok("Video added successfully!");
             };
             case (#err("Error adding video")) {
-                return #err("Error adding video");
+                return #err("Error adding video to storage");
             };
             case (_) {
                 return #err("Unexpected Error.");
+            };
+        };
+    };
+
+    public shared (msg) func sendFriendRequest(username : Text, date : Text) : async Result<Text, Text> {
+
+        let caller = msg.caller;
+        var callerUserName : Text = "";
+        let user = users.get(caller);
+        var following = false;
+
+        switch (user) {
+            case (?user) {
+                let alreadyFollowing = Array.find(user.followingList, func(following : Text) : Bool { following == username });
+                if (alreadyFollowing != null) {
+                    return #err("Already following the user.");
+                } else {
+                    callerUserName := user.username;
+                    let updatedUser = {
+                        username = user.username;
+                        displayname = user.displayname;
+                        profilePicture = user.profilePicture;
+                        bio = user.bio;
+                        followers = user.followers;
+                        following = user.following + 1;
+                        postsCount = user.postsCount;
+                        followerList = user.followerList;
+                        followingList = Array.append(user.followingList, [username]);
+                        friendRequests = user.friendRequests;
+                        posts = user.posts;
+                        reels = user.reels;
+                        tagged = user.tagged;
+                        saved = user.saved;
+                        notifications = user.notifications;
+                        chatIds = user.chatIds;
+                    };
+                    let _ = users.put(caller, updatedUser);
+                    following := true;
+                };
+            };
+            case (_) {
+                following := false;
+            };
+        };
+
+        if (following == true) {
+            let friendPrincipal = usernames.get(username);
+            switch (friendPrincipal) {
+                case (?friendPrincipal) {
+                    let friend = users.get(friendPrincipal);
+                    switch (friend) {
+                        case (?userDetails) {
+                            let updatedUser = {
+                                username = userDetails.username;
+                                displayname = userDetails.displayname;
+                                profilePicture = userDetails.profilePicture;
+                                bio = userDetails.bio;
+                                followers = userDetails.followers + 1;
+                                following = userDetails.following;
+                                postsCount = userDetails.postsCount;
+                                followerList = Array.append(userDetails.followerList, [callerUserName]);
+                                followingList = userDetails.followingList;
+                                friendRequests = Array.append(userDetails.friendRequests, [callerUserName]);
+                                posts = userDetails.posts;
+                                reels = userDetails.reels;
+                                tagged = userDetails.tagged;
+                                saved = userDetails.saved;
+                                notifications = Array.append(userDetails.notifications, [{ notificationType = "Friend Request"; message = " sent you a friend request."; addresses = ""; date = date; from = callerUserName }]);
+                                chatIds = userDetails.chatIds;
+                            };
+                            let _ = users.put(friendPrincipal, updatedUser);
+                            return #ok("Friend request sent successfully.");
+                        };
+                        case null {
+                            return #err("User does not exist.");
+                        };
+                    };
+                };
+                case null {
+                    return #err("User does not exist.");
+                };
+            };
+        } else {
+            return #err("Error sending friend request.");
+        };
+    };
+
+    public shared (msg) func acceptFriendRequest(username : Text, date : Text) : async Result<Text, Text> {
+
+        let caller = msg.caller;
+        var callerUserName : Text = "";
+        let user = users.get(caller);
+        var following = false;
+
+        switch (user) {
+            case (?userDetails) {
+                let alreadyFollowing = Array.find(userDetails.followingList, func(following : Text) : Bool { following == username });
+                let hasFriendRequest = Array.find(userDetails.friendRequests, func(friend : Text) : Bool { friend == username });
+                if (alreadyFollowing == null and hasFriendRequest == null) {
+                    return #err("Something went wrong.");
+                } else {
+                    callerUserName := userDetails.username;
+                    let updatedUser = {
+                        username = userDetails.username;
+                        displayname = userDetails.displayname;
+                        profilePicture = userDetails.profilePicture;
+                        bio = userDetails.bio;
+                        followers = userDetails.followers;
+                        following = userDetails.following + 1;
+                        postsCount = userDetails.postsCount;
+                        followerList = userDetails.followerList;
+                        followingList = Array.append(userDetails.followingList, [username]);
+                        friendRequests = Array.filter(userDetails.friendRequests, func(friend : Text) : Bool { friend != username });
+                        posts = userDetails.posts;
+                        reels = userDetails.reels;
+                        tagged = userDetails.tagged;
+                        saved = userDetails.saved;
+                        notifications = userDetails.notifications;
+                        chatIds = userDetails.chatIds;
+                    };
+                    let _ = users.put(caller, updatedUser);
+                    following := true;
+                };
+            };
+            case null {
+                return #err("User does not exist.");
+            };
+        };
+
+        if (following == true) {
+            let friendPrincipal = usernames.get(username);
+            switch (friendPrincipal) {
+                case (?friendPrincipal) {
+                    let friend = users.get(friendPrincipal);
+                    switch (friend) {
+                        case (?userDetails) {
+                            let updatedUser = {
+                                username = userDetails.username;
+                                displayname = userDetails.displayname;
+                                profilePicture = userDetails.profilePicture;
+                                bio = userDetails.bio;
+                                followers = userDetails.followers + 1;
+                                following = userDetails.following;
+                                postsCount = userDetails.postsCount;
+                                followerList = Array.append(userDetails.followerList, [callerUserName]);
+                                followingList = userDetails.followingList;
+                                friendRequests = userDetails.friendRequests;
+                                posts = userDetails.posts;
+                                reels = userDetails.reels;
+                                tagged = userDetails.tagged;
+                                saved = userDetails.saved;
+                                notifications = Array.append(userDetails.notifications, [{ notificationType = "Accept Request"; message = " accepted your friend request."; addresses = ""; date = date; from = callerUserName }]);
+                                chatIds = userDetails.chatIds;
+                            };
+                            let _ = users.put(friendPrincipal, updatedUser);
+                            return #ok("Friend request accepted successfully.");
+                        };
+                        case null {
+                            return #err("User does not exist.");
+                        };
+                    };
+                };
+                case null {
+                    return #err("User does not exist.");
+                };
+            };
+        } else {
+            return #err("Error accepting friend request.");
+        };
+    };
+
+    public shared (msg) func unFollow(username : Text) : async Result<Text, Text> {
+
+        let caller = msg.caller;
+        var callerUserName : Text = "";
+        let user = users.get(caller);
+        var unfollowed = false;
+
+        switch (user) {
+            case (?userDetails) {
+                let followingUser = Array.find(userDetails.followingList, func(following : Text) : Bool { following == username });
+                if (followingUser == null) {
+                    return #err("Not following yet.");
+                } else {
+                    callerUserName := userDetails.username;
+                    let updatedUser = {
+                        username = userDetails.username;
+                        displayname = userDetails.displayname;
+                        profilePicture = userDetails.profilePicture;
+                        bio = userDetails.bio;
+                        followers = userDetails.followers;
+                        following = userDetails.following - 1;
+                        postsCount = userDetails.postsCount;
+                        followerList = userDetails.followerList;
+                        followingList = Array.filter(userDetails.followingList, func(following : Text) : Bool { following != username });
+                        friendRequests = userDetails.friendRequests;
+                        posts = userDetails.posts;
+                        reels = userDetails.reels;
+                        tagged = userDetails.tagged;
+                        saved = userDetails.saved;
+                        notifications = userDetails.notifications;
+                        chatIds = userDetails.chatIds;
+                    };
+                    let _ = users.put(caller, updatedUser);
+                    unfollowed := true;
+                };
+            };
+            case null {
+                return #err("User does not exist.");
+            };
+        };
+
+        if (unfollowed == true) {
+            let friendPrincipal = usernames.get(username);
+            switch (friendPrincipal) {
+                case (?friendPrincipal) {
+                    let friend = users.get(friendPrincipal);
+                    switch (friend) {
+                        case (?userDetails) {
+                            let updatedUser = {
+                                username = userDetails.username;
+                                displayname = userDetails.displayname;
+                                profilePicture = userDetails.profilePicture;
+                                bio = userDetails.bio;
+                                followers = userDetails.followers - 1;
+                                following = userDetails.following;
+                                postsCount = userDetails.postsCount;
+                                followerList = Array.filter(userDetails.followerList, func(follower : Text) : Bool { follower != callerUserName });
+                                followingList = userDetails.followingList;
+                                friendRequests = userDetails.friendRequests;
+                                posts = userDetails.posts;
+                                reels = userDetails.reels;
+                                tagged = userDetails.tagged;
+                                saved = userDetails.saved;
+                                notifications = userDetails.notifications;
+                                chatIds = userDetails.chatIds;
+                            };
+                            let _ = users.put(friendPrincipal, updatedUser);
+                            return #ok("User unfollowed successfully.");
+                        };
+                        case null {
+                            return #err("User does not exist.");
+                        };
+                    };
+                };
+                case null {
+                    return #err("User does not exist.");
+                };
+            };
+        } else {
+            return #err("Error unfollowing user.");
+        };
+    };
+
+    public shared (msg) func getMessages() : async ?UserChats {
+        let caller = msg.caller;
+        let result = await messages.getMessages(caller);
+        return result;
+    };
+
+    public shared (msg) func postMessage(sender : Text, message : Text, media : Blob, date : Text) : async ?Text {
+        let caller = msg.caller;
+        let result = await messages.postMessage(caller, sender, message, media, date);
+        switch (?result) {
+            case (?res) {
+                return res;
+            };
+            case null {
+                return null;
             };
         };
     };

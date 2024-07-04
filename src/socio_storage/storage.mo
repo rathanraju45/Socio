@@ -3,6 +3,7 @@ import Text "mo:base/Text";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Result "mo:base/Result";
+import Principal "mo:base/Principal";
 
 actor {
 
@@ -15,14 +16,14 @@ actor {
         img : Blob;
         caption : Text;
         date : Text;
-        owner : Text;
+        owner : Principal;
     };
 
     type Video = {
         video : Blob;
         caption : Text;
         date : Text;
-        owner : Text;
+        owner : Principal;
     };
 
     private var posts : HashMap.HashMap<Text, Post> = HashMap.HashMap<Text, Post>(10, Text.equal, Text.hash);
@@ -41,12 +42,12 @@ actor {
         videos := HashMap.fromIter<Text, Video>(upgradeVideos.vals(), 10, Text.equal, Text.hash);
     };
 
-    public func addPost(id : Text, img : Blob, caption : Text, date : Text, owner : Text) : async Result<Text, Text> {
+    public func addPost(id : Text, img : Blob, caption : Text, date : Text, owner : Principal) : async Result<Text, Text> {
         try{
             let _ = posts.put(id, {img=img; caption=caption; date=date; owner=owner});
-            return #ok("Post added successfully!");
+            return #ok("Post added to storage");
         } catch (error){
-            return #err("Error adding post");
+            return #err("Error adding post to storage");
         }
     };
 
@@ -62,12 +63,12 @@ actor {
         }
     };
 
-    public func addVideo(id: Text, video : Blob, caption : Text, date : Text, owner : Text) : async Result<Text, Text>{
+    public func addVideo(id: Text, video : Blob, caption : Text, date : Text, owner : Principal) : async Result<Text, Text>{
         try{
             let _ = videos.put(id, {video=video; caption=caption; date=date; owner=owner});
-            return #ok("Video added successfully!");
+            return #ok("Video added to storage");
         } catch (error){
-            return #err("Error adding video");
+            return #err("Error adding video to storage");
         }
     };
 

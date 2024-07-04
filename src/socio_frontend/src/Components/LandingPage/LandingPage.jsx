@@ -101,7 +101,7 @@ const LandingPage = ({setLoading}) => {
 
                 <div className="feature">
                     <img src={messaging_icon} alt="Feature-1"/>
-                    <h3>Messaging and Content Creation</h3>
+                    <h3>Messaging and Content Sharing</h3>
                     <div>
                         <ul>
                             <li>Seamlessly connect with friends, family, and communities through our intuitive messaging

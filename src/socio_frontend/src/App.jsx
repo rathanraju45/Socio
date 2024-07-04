@@ -30,6 +30,7 @@ import Create from "./Components/Create/Create.jsx";
 import LandingPage from "./Components/LandingPage/LandingPage.jsx";
 import Register from "./Components/Register/Register.jsx";
 import Loader from "./Components/Loaders/Loader.jsx";
+import Alert from "./Components/Alert/Alert.jsx";
 
 /**
  * The `App` functional component.
@@ -107,21 +108,21 @@ export default function App() {
     }, [identity]);
 
     useEffect(() => {
-    const handleClickOutside = (event) => {
-        if (isMiscellaneousOpen && !miscellaneousRef.current.contains(event.target)) {
-            setIsMiscellaneousOpen(false);
-            toggleSideBar(false);
-        }
-    };
+        const handleClickOutside = (event) => {
+            if (isMiscellaneousOpen && !miscellaneousRef.current.contains(event.target)) {
+                setIsMiscellaneousOpen(false);
+                toggleSideBar(false);
+            }
+        };
 
-    // Listen for click events on the document
-    document.addEventListener('mousedown', handleClickOutside);
+        // Listen for click events on the document
+        document.addEventListener('mousedown', handleClickOutside);
 
-    // Clean up the event listener when the component unmounts
-    return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-    };
-}, [isMiscellaneousOpen]);
+        // Clean up the event listener when the component unmounts
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isMiscellaneousOpen]);
 
     return (
         <div className="App" id={darkMode ? "darkBG" : "lightBG"}>
@@ -129,6 +130,8 @@ export default function App() {
             {loading && (
                 <Loader loading={loading}/>
             )}
+
+            <Alert />
 
             {
                 loggedIn ?

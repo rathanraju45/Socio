@@ -14,7 +14,8 @@
     },
     "socio_backend": {
       "dependencies": [
-        "socio_storage"
+        "socio_storage",
+        "socio_messages_storage"
       ],
       "main": "src/socio_backend/main.mo",
       "type": "motoko"
@@ -31,6 +32,10 @@
     },
     "socio_storage":{
       "main": "src/socio_storage/storage.mo",
+      "type": "motoko"
+    },
+    "socio_messages_storage":{
+      "main": "src/socio_messages_storage/messages.mo",
       "type": "motoko"
     }
   },

@@ -85,6 +85,8 @@ function Register({setLoading}) {
             reels: [],
             tagged: [],
             saved: [],
+            notifications: [],
+            chatIds: [],
         });
 
         if (registerResult["ok"]) {
@@ -94,9 +96,9 @@ function Register({setLoading}) {
                 displayname: displayname,
                 profilePicture: binaryProfile,
                 bio: bio,
-                followers: 0,
-                following: 0,
-                postsCount: 0,
+                followers: BigInt(0),
+                following: BigInt(0),
+                postsCount: BigInt(0),
                 followerList : [],
                 followingList : [],
                 friendRequests : [],
@@ -104,6 +106,8 @@ function Register({setLoading}) {
                 reels: [],
                 tagged: [],
                 saved: [],
+                notifications : [],
+                chatIds: [],
             })
         } else {
             setRegisterMessage(registerResult["err"]);

@@ -10,7 +10,7 @@ import {v4 as uuidv4} from 'uuid';
 // eslint-disable-next-line react/prop-types
 export default function Create ({ isOpen, onClose }){
 
-    const {actor} = useContext(GlobalStore);
+    const {setAlert,actor,setUserDetails} = useContext(GlobalStore);
     const {binary, convertToBinary} = useConvertToBinary();
 
     const [file, setFile] = useState(null);
@@ -32,8 +32,24 @@ export default function Create ({ isOpen, onClose }){
             const fileId = uuidv4();
             const uploadDate = new Date();
             let submitRes = await actor.setPost(fileId, binaryFile, caption, uploadDate.toISOString());
-            alert(submitRes["ok"]);
+
             if(submitRes["ok"]){
+                setAlert({message: submitRes["ok"], type: "success"});
+                setUserDetails(previousDetails => ({
+                    ...previousDetails,
+                    postsCount: previousDetails.postsCount + BigInt(1),
+                    posts: [...previousDetails.posts,fileId]
+                }))
+                onClose();
+                setCaption('');
+                setFile(null);
+            } else if(submitRes["err"]){
+                setAlert({message: submitRes["err"], type: "error"});
+                onClose();
+                setCaption('');
+                setFile(null);
+            } else{
+                setAlert({message: "An error occurred. Please try again.", type: "error"});
                 onClose();
                 setCaption('');
                 setFile(null);
