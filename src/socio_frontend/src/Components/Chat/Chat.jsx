@@ -23,7 +23,6 @@ import {
     faVideo
 } from "@fortawesome/free-solid-svg-icons";
 import {GlobalStore} from "../../store/GlobalStore.jsx";
-import {useParams} from "react-router-dom";
 
 /**
  * The main Chat component

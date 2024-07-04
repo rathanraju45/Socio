@@ -11,7 +11,7 @@ export default function useConvertProfileImages() {
     };
 
     const convertAccounts = (accounts) => {
-        setUpdatedAccounts(accounts.map((account,index) => {
+        setUpdatedAccounts(accounts.map((account) => {
                 const updatedAccount = {...account};
                 updatedAccount[0].profilePicture = convertToImage(account[0].profilePicture);
                 return updatedAccount;

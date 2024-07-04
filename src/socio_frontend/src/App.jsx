@@ -43,7 +43,6 @@ import Alert from "./Components/Alert/Alert.jsx";
 export default function App() {
 
     const [loading, setLoading] = useState(null);
-    const [loadingUserDetails, setLoadingUserDetails] = useState(null);
 
     const miscellaneousRef = useRef(null);
 

@@ -6,7 +6,7 @@ import useConvertToBinary from "../../hooks/useConverToBinary.js";
 
 function Register({setLoading}) {
 
-    const {actor, setUserDetails} = useContext(GlobalStore);
+    const {setAlert,actor, setUserDetails} = useContext(GlobalStore);
     const {binary, convertToBinary} = useConvertToBinary();
 
     const [username, setUsername] = useState('');
@@ -15,8 +15,6 @@ function Register({setLoading}) {
     const [profilePicture, setProfilePicture] = useState(null);
     const [bio, setBio] = useState('');
     const [bioWordCount, setBioWordCount] = useState(0);
-
-    const [registerMessage, setRegisterMessage] = useState(null);
 
     const [usernameError, setUsernameError] = useState(null);
     const [displayNameError, setDisplayNameError] = useState(null);
@@ -90,7 +88,7 @@ function Register({setLoading}) {
         });
 
         if (registerResult["ok"]) {
-            setRegisterMessage(registerResult["ok"]);
+            setAlert(registerResult["ok"]);
             setUserDetails({
                 username: username,
                 displayname: displayname,
@@ -110,7 +108,7 @@ function Register({setLoading}) {
                 chatIds: [],
             })
         } else {
-            setRegisterMessage(registerResult["err"]);
+            setAlert(registerResult["err"]);
         }
         setLoading(null);
     };

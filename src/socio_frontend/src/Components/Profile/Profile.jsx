@@ -3,7 +3,6 @@ import React, {useContext, useEffect, useState} from "react";
 import './Profile.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus, faImage, faFilm, faTag, faBookmark} from "@fortawesome/free-solid-svg-icons";
-import default_profile from "../../../public/images/illustrations/default_profile.png";
 
 import {GlobalStore} from "../../store/GlobalStore.jsx";
 import useConvertToImage from "../../hooks/useConvertToImage.js";

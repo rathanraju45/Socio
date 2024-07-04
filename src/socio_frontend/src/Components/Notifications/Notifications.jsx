@@ -2,7 +2,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import './Notifications.css';
 import {GlobalStore} from "../../store/GlobalStore.jsx";
-import useConvertToImage from "../../hooks/useConvertToImage.js";
 import useConvertNotificationProfiles from "../../hooks/useConvertNotificationProfiles.js";
 import {useNavigate} from "react-router-dom";
 

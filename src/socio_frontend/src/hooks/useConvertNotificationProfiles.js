@@ -1,5 +1,4 @@
-import React, {useState} from "react";
-import notifications from "../Constants/notifications.js";
+import {useState} from "react";
 
 export default function useConvertNotificationProfiles() {
     const [updatedNotifications, setUpdatedNotifications] = useState([]);
