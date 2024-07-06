@@ -2,15 +2,19 @@
 import React, {useContext, useEffect, useState} from "react";
 import './Profile.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlus, faImage, faFilm, faTag, faBookmark} from "@fortawesome/free-solid-svg-icons";
+import {faBookmark, faFilm, faImage, faPlus, faTag} from "@fortawesome/free-solid-svg-icons";
 
 import {GlobalStore} from "../../store/GlobalStore.jsx";
 import useConvertToImage from "../../hooks/useConvertToImage.js";
 import Loader from "../Loaders/Loader.jsx";
 import useConvertPostsImages from "../../hooks/useConvertPostsImages.jsx";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
-export default function Profile({typeOfProfile}) {
+import chatIdGenerator from '../../Constants/chatIdGenerator.js';
+
+export default function Profile({typeOfProfile,setSelectedChat}) {
+
+    const navigate = useNavigate();
 
     const {username: profileUser} = useParams();
 
@@ -110,7 +114,8 @@ export default function Profile({typeOfProfile}) {
 
     async function sendFriendRequest(username) {
         const date = new Date();
-        const res = await actor.sendFriendRequest(username,date.toISOString());
+        const chatId = chatIdGenerator(userDetails.username, username);
+        const res = await actor.sendFriendRequest(username,date.toISOString(),chatId);
         if(res["ok"]){
             setAlert({
                 message: res["ok"],
@@ -126,7 +131,8 @@ export default function Profile({typeOfProfile}) {
 
     async function acceptFriendRequest(username) {
         const date = new Date();
-        let res = await actor.acceptFriendRequest(username, date.toISOString());
+        const chatId = chatIdGenerator(userDetails.username, username);
+        let res = await actor.acceptFriendRequest(username, date.toISOString(),chatId);
         if(res["ok"]){
             setAlert({
                 message: res["ok"],
@@ -153,6 +159,22 @@ export default function Profile({typeOfProfile}) {
                 type: "error"
             })
         }
+    }
+
+    async function fetchChats(){
+        const chatId = chatIdGenerator(userDetails.username, profileUser);
+        const profileDetails = await actor.getProfileDetails(profileUser);
+        let chatProfilePic = profileDetails["ok"].profilePicture;
+        const arrayBuffer = new Uint8Array(chatProfilePic).buffer;
+        const imageBlob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+        chatProfilePic = URL.createObjectURL(imageBlob);
+        let messages = await actor.getMessages(chatId);
+        setSelectedChat({
+            name: profileUser,
+            profilePic: chatProfilePic,
+            status: "Online",
+            messages: messages
+        })
     }
 
     return (
@@ -210,7 +232,10 @@ export default function Profile({typeOfProfile}) {
                                                             userDetails.friendRequests.includes(profileUser) ? "Follow Back" : userDetails.followingList.includes(profileUser) ? "Following" : "Follow"
                                                         }
                                                     </div>
-                                                    <div>Message</div>
+                                                    <div onClick={() => {
+                                                        navigate('/chat');
+                                                        fetchChats();
+                                                    }}>Message</div>
                                                 </> : <div>Edit profile</div>
 
                                             )}
@@ -252,31 +277,52 @@ export default function Profile({typeOfProfile}) {
 
                                     <div id="profile-actions">
                                         <h1>{profile.username}</h1>
+
                                         <div className="action-group">
                                             {typeOfProfile === "self" ? (
                                                 <div>Edit profile</div>
                                             ) : (
-                                                <>
-                                                    <div onClick={() => {
-                                                        if (profile.friendRequests.includes(profileUser)) {
-                                                            acceptFriendRequest(profileUser);
-                                                            setProfileUpdated(true);
-                                                        } else if (profile.followingList.includes(profileUser)) {
-                                                            unFollow(profileUser);
-                                                            setProfileUpdated(true);
-                                                        } else {
-                                                            sendFriendRequest(profileUser);
-                                                            setProfileUpdated(true);
-                                                        }
-                                                    }}>
-                                                        {
-                                                            friendRequests.includes(profileUser) ? "Follow Back" : "Follow"
-                                                        }
-                                                    </div>
-                                                    <div>Message</div>
-                                                </>
+                                                userDetails.username !== profileUser ?
+                                                    <>
+                                                        <div onClick={() => {
+                                                            if (userDetails.friendRequests.includes(profileUser)) {
+                                                                acceptFriendRequest(profileUser);
+                                                                setUserDetails(prevUserDetails => ({
+                                                                    ...prevUserDetails,
+                                                                    following: prevUserDetails.following + BigInt(1),
+                                                                    friendRequests: prevUserDetails.friendRequests.filter(user => user !== profileUser),
+                                                                    followingList: [...prevUserDetails.followingList, profileUser]
+                                                                }));
+                                                            } else if (userDetails.followingList.includes(profileUser)) {
+                                                                unFollow(profileUser);
+                                                                setUserDetails(prevUserDetails => ({
+                                                                    ...prevUserDetails,
+                                                                    following: prevUserDetails.following - BigInt(1),
+                                                                    followingList: prevUserDetails.followingList.filter(user => user !== profileUser)
+                                                                }));
+                                                            } else {
+                                                                sendFriendRequest(profileUser);
+                                                                setUserDetails(prevUserDetails => ({
+                                                                    ...prevUserDetails,
+                                                                    following: prevUserDetails.following + BigInt(1),
+                                                                    followingList: [...prevUserDetails.followingList, profileUser]
+                                                                }));
+                                                            }
+                                                        }}>
+                                                            {
+                                                                userDetails.friendRequests.includes(profileUser) ? "Follow Back" : userDetails.followingList.includes(profileUser) ? "Following" : "Follow"
+                                                            }
+                                                        </div>
+                                                        <div onClick={() => {
+                                                            navigate('/chat');
+                                                            setSelectedChat(profileUser);
+                                                        }}>Message
+                                                        </div>
+                                                    </> : <div>Edit profile</div>
+
                                             )}
                                         </div>
+
                                     </div>
 
                                 </div>

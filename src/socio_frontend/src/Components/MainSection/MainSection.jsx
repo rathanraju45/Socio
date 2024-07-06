@@ -12,7 +12,7 @@
 
 // Importing necessary modules and components
 // eslint-disable-next-line no-unused-vars
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {Routes, Route} from "react-router-dom";
 import './MainSection.css';
 import {GlobalStore} from "../../store/GlobalStore.jsx";
@@ -31,6 +31,8 @@ import Feed from "../Feed/Feed.jsx";
  * @returns {JSX.Element} The rendered JSX element
  */
 export default function MainSection() {
+
+    const [selectedChat, setSelectedChat] = useState(null); // The chat that is currently selected
 
     // Access the sidebar minimized state from the global store
     const {sideBarMinimized} = useContext(GlobalStore);
@@ -152,10 +154,10 @@ export default function MainSection() {
 
                     </div>
                 }/>
-                <Route path="/chat" element={<Chat/>}/>
+                <Route path="/chat" element={<Chat selectedChat={selectedChat} setSelectedChat={setSelectedChat} />}/>
                 <Route path="/explore" element={<Explore/>}/>
-                <Route path="/profile" element={<Profile typeOfProfile={"self"}/>}/>
-                <Route path={"/profile/:username"} element={<Profile typeOfProfile={"non-self"}/>}/>
+                <Route path="/profile" element={<Profile typeOfProfile={"self"} setSelectedChat={setSelectedChat} />}/>
+                <Route path={"/profile/:username"} element={<Profile typeOfProfile={"non-self"} setSelectedChat={setSelectedChat} />}/>
             </Routes>
         </div>
     )

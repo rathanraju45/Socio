@@ -78,8 +78,8 @@ actor {
 
     type Message = {
         sender : Text;
-        message : Text;
-        media : Blob;
+        message : ?Text;
+        media : ?Blob;
         date : Text;
     };
 
@@ -243,7 +243,20 @@ actor {
             case null {
                 return #err("User does not exist.");
             };
-            case _ {
+            case (?user) {
+                let postAdresses = Array.map(
+                    user.posts,
+                    func(postId : Text) : Text {
+                        postId;
+                    },
+                );
+                let videoAdresses = Array.map(
+                    user.posts,
+                    func(videoId : Text) : Text {
+                        videoId;
+                    },
+                );
+                let _ = await storage.deleteUserStorage(postAdresses, videoAdresses);
                 let _ = users.remove(caller);
                 return #ok("User deleted successfully.");
             };
@@ -253,6 +266,8 @@ actor {
     public func deleteUsers() : async Text {
         users := HashMap.HashMap<Principal, UserDetails>(10, Principal.equal, Principal.hash);
         usernames := HashMap.HashMap<Text, Principal>(10, Text.equal, Text.hash);
+        let _ = await storage.deleteStorage();
+        let _ = await messages.deleteMessageStorage();
         return "All users deleted successfully.";
     };
 
@@ -370,90 +385,102 @@ actor {
         };
     };
 
-    public shared (msg) func sendFriendRequest(username : Text, date : Text) : async Result<Text, Text> {
+    public shared (msg) func sendFriendRequest(username : Text, date : Text, chatId : Text) : async Result<Text, Text> {
 
         let caller = msg.caller;
         var callerUserName : Text = "";
         let user = users.get(caller);
         var following = false;
 
-        switch (user) {
-            case (?user) {
-                let alreadyFollowing = Array.find(user.followingList, func(following : Text) : Bool { following == username });
-                if (alreadyFollowing != null) {
-                    return #err("Already following the user.");
-                } else {
-                    callerUserName := user.username;
-                    let updatedUser = {
-                        username = user.username;
-                        displayname = user.displayname;
-                        profilePicture = user.profilePicture;
-                        bio = user.bio;
-                        followers = user.followers;
-                        following = user.following + 1;
-                        postsCount = user.postsCount;
-                        followerList = user.followerList;
-                        followingList = Array.append(user.followingList, [username]);
-                        friendRequests = user.friendRequests;
-                        posts = user.posts;
-                        reels = user.reels;
-                        tagged = user.tagged;
-                        saved = user.saved;
-                        notifications = user.notifications;
-                        chatIds = user.chatIds;
-                    };
-                    let _ = users.put(caller, updatedUser);
-                    following := true;
-                };
-            };
-            case (_) {
-                following := false;
-            };
-        };
-
-        if (following == true) {
-            let friendPrincipal = usernames.get(username);
-            switch (friendPrincipal) {
-                case (?friendPrincipal) {
-                    let friend = users.get(friendPrincipal);
-                    switch (friend) {
-                        case (?userDetails) {
+        let res = await createChatId(chatId);
+        switch (res) {
+            case "ok" {
+                switch (user) {
+                    case (?user) {
+                        let alreadyFollowing = Array.find(user.followingList, func(following : Text) : Bool { following == username });
+                        if (alreadyFollowing != null) {
+                            return #err("Already following the user.");
+                        } else {
+                            callerUserName := user.username;
                             let updatedUser = {
-                                username = userDetails.username;
-                                displayname = userDetails.displayname;
-                                profilePicture = userDetails.profilePicture;
-                                bio = userDetails.bio;
-                                followers = userDetails.followers + 1;
-                                following = userDetails.following;
-                                postsCount = userDetails.postsCount;
-                                followerList = Array.append(userDetails.followerList, [callerUserName]);
-                                followingList = userDetails.followingList;
-                                friendRequests = Array.append(userDetails.friendRequests, [callerUserName]);
-                                posts = userDetails.posts;
-                                reels = userDetails.reels;
-                                tagged = userDetails.tagged;
-                                saved = userDetails.saved;
-                                notifications = Array.append(userDetails.notifications, [{ notificationType = "Friend Request"; message = " sent you a friend request."; addresses = ""; date = date; from = callerUserName }]);
-                                chatIds = userDetails.chatIds;
+                                username = user.username;
+                                displayname = user.displayname;
+                                profilePicture = user.profilePicture;
+                                bio = user.bio;
+                                followers = user.followers;
+                                following = user.following + 1;
+                                postsCount = user.postsCount;
+                                followerList = user.followerList;
+                                followingList = Array.append(user.followingList, [username]);
+                                friendRequests = user.friendRequests;
+                                posts = user.posts;
+                                reels = user.reels;
+                                tagged = user.tagged;
+                                saved = user.saved;
+                                notifications = user.notifications;
+                                chatIds = Array.append(user.chatIds, [chatId]);
                             };
-                            let _ = users.put(friendPrincipal, updatedUser);
-                            return #ok("Friend request sent successfully.");
+                            let _ = users.put(caller, updatedUser);
+                            following := true;
+                        };
+                    };
+                    case (_) {
+                        following := false;
+                    };
+                };
+
+                if (following == true) {
+                    let friendPrincipal = usernames.get(username);
+                    switch (friendPrincipal) {
+                        case (?friendPrincipal) {
+                            let friend = users.get(friendPrincipal);
+                            switch (friend) {
+                                case (?userDetails) {
+                                    let updatedUser = {
+                                        username = userDetails.username;
+                                        displayname = userDetails.displayname;
+                                        profilePicture = userDetails.profilePicture;
+                                        bio = userDetails.bio;
+                                        followers = userDetails.followers + 1;
+                                        following = userDetails.following;
+                                        postsCount = userDetails.postsCount;
+                                        followerList = Array.append(userDetails.followerList, [callerUserName]);
+                                        followingList = userDetails.followingList;
+                                        friendRequests = Array.append(userDetails.friendRequests, [callerUserName]);
+                                        posts = userDetails.posts;
+                                        reels = userDetails.reels;
+                                        tagged = userDetails.tagged;
+                                        saved = userDetails.saved;
+                                        notifications = Array.append(userDetails.notifications, [{ notificationType = "Friend Request"; message = " sent you a friend request."; addresses = ""; date = date; from = callerUserName }]);
+                                        chatIds = userDetails.chatIds;
+                                    };
+                                    let _ = users.put(friendPrincipal, updatedUser);
+                                    return #ok("Friend request sent successfully.");
+                                };
+                                case null {
+                                    return #err("User does not exist.");
+                                };
+                            };
                         };
                         case null {
                             return #err("User does not exist.");
                         };
                     };
-                };
-                case null {
-                    return #err("User does not exist.");
+                } else {
+                    return #err("Error sending friend request.");
                 };
             };
-        } else {
-            return #err("Error sending friend request.");
+            case "err" {
+                return #err("Error creating chat id. Try again.");
+            };
+            case _ {
+                return #err("Unexpected Error. Try again.");
+            };
         };
+
     };
 
-    public shared (msg) func acceptFriendRequest(username : Text, date : Text) : async Result<Text, Text> {
+    public shared (msg) func acceptFriendRequest(username : Text, date : Text, chatId : Text) : async Result<Text, Text> {
 
         let caller = msg.caller;
         var callerUserName : Text = "";
@@ -484,7 +511,7 @@ actor {
                         tagged = userDetails.tagged;
                         saved = userDetails.saved;
                         notifications = userDetails.notifications;
-                        chatIds = userDetails.chatIds;
+                        chatIds = Array.append(userDetails.chatIds, [chatId]);
                     };
                     let _ = users.put(caller, updatedUser);
                     following := true;
@@ -620,15 +647,25 @@ actor {
         };
     };
 
-    public shared (msg) func getMessages() : async ?UserChats {
-        let caller = msg.caller;
-        let result = await messages.getMessages(caller);
+    public func createChatId(chatId : Text) : async Text {
+        let res = await messages.createChatId(chatId);
+        switch (res) {
+            case (#ok("Chat id created")) {
+                return "ok";
+            };
+            case _ {
+                return "null";
+            };
+        };
+    };
+
+    public func getMessages(chatId : Text) : async ?UserChats {
+        let result = await messages.getMessages(chatId);
         return result;
     };
 
-    public shared (msg) func postMessage(sender : Text, message : Text, media : Blob, date : Text) : async ?Text {
-        let caller = msg.caller;
-        let result = await messages.postMessage(caller, sender, message, media, date);
+    public func postMessage(chatId : Text, sender : Text, message : ?Text, media : ?Blob, date : Text) : async ?Text {
+        let result = await messages.postMessage(chatId, sender, message, media, date);
         switch (?result) {
             case (?res) {
                 return res;

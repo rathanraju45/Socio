@@ -84,10 +84,30 @@ actor {
         }
     };
 
+    public func deletePost(id : Text) : async Text {
+        let _ = posts.remove(id);
+        return "Post deleted successfully!";
+    };
+
+    public func deleteVideo(id : Text) : async Text {
+        let _ = videos.remove(id);
+        return "Video deleted successfully!";
+    };
+
+    public func deleteUserStorage(postAddresses : [Text],videoAddresses : [Text]) : async Text {
+        for (postAddress in postAddresses.vals()){
+            let _ = posts.remove(postAddress);
+        };
+        for (videoAddress in videoAddresses.vals()){
+            let _ = videos.remove(videoAddress);
+        };
+        return "User posts deleted successfully!";
+    };
+
     public func deleteStorage() : async Text{
         posts := HashMap.HashMap<Text, Post>(10, Text.equal, Text.hash);
         videos := HashMap.HashMap<Text, Video>(10, Text.equal, Text.hash);
         return "Storage deleted successfully!";
-    }
+    };
 
 };

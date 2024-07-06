@@ -6,6 +6,7 @@
 }
 
 #chat-list {
+    min-width: 25%;
     width: 25%;
     border-right: 1px solid #ccc;
     padding: 10px;
@@ -42,14 +43,13 @@
     width: 100%;
 }
 
-#chat-list-data::-webkit-scrollbar {
-    width: 5px;
+#no-chats{
+    text-align: center;
+    margin: auto;
 }
 
-#chat-list-data > div {
-    display: flex;
-    padding: 10px;
-    cursor: pointer;
+#chat-list-data::-webkit-scrollbar {
+    width: 5px;
 }
 
 .chat-details {
@@ -78,10 +78,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: grey !important
+    color: grey !important;
 }
 
-#chat-list img {
+#chat-list img, #chat-header img {
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -91,6 +91,31 @@
 #chat-content {
     width: 100%;
     height: 100%;
+}
+
+.chat-item {
+    border: 1px solid #dbdbdb;
+    margin-bottom: 8px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.chat-item img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    border: 3px solid transparent;
+    background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, red, purple);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    box-decoration-break: clone;
 }
 
 #selected-chat {
@@ -124,7 +149,7 @@
     overflow-y: auto;
     padding: 10px;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
 }
 
 .message-item {
@@ -154,6 +179,12 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
+    border: 3px solid transparent;
+    background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, red, purple);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    box-decoration-break: clone;
 }
 
 #messages-section p {
