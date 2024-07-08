@@ -136,7 +136,7 @@ export default function App() {
                 loggedIn ?
                     userDetails === null ? <Register setLoading={setLoading}/> :
                         <>
-                            <Create isOpen={isCreateModalOpen} onClose={handleCreateCloseModal}/>
+                            <Create isOpen={isCreateModalOpen} onClose={handleCreateCloseModal} setLoading={setLoading}/>
 
                             {
                                 <>
@@ -148,8 +148,9 @@ export default function App() {
                                                  handleCreateOpenModal={handleCreateOpenModal}
                                                  handleCreateCloseModal={handleCreateCloseModal}
                                                  miscellaneous={setIsMiscellaneousOpen}
-                                                 miscellaneousType={setMiscellaneousType}/>}
-                                    <MainSection/>
+                                                 miscellaneousType={setMiscellaneousType}
+                                        />}
+                                    <MainSection />
                                     <div id="miscellaneous" ref={miscellaneousRef}
                                          className={miscellaneousType !== '' && isMiscellaneousOpen ? "miscellaneous-open" : "miscellaneous-close"}
                                          style={{
@@ -157,13 +158,14 @@ export default function App() {
                                          }}>
                                         {
                                             isMiscellaneousOpen &&
-                                            miscellaneousType === 'notifications' ? <Notifications/> : <Search/>
+                                            miscellaneousType === 'notifications' ? <Notifications/> : <Search miscellaneous={setIsMiscellaneousOpen}/>
                                         }
                                     </div>
                                     {deviceType === 'mobile' &&
                                         <NavBar handleCreateOpenModal={handleCreateOpenModal}
                                                 miscellaneous={setIsMiscellaneousOpen}
-                                                miscellaneousType={setMiscellaneousType}/>}
+                                                miscellaneousType={setMiscellaneousType}
+                                        />}
                                 </>
                             }
                         </>

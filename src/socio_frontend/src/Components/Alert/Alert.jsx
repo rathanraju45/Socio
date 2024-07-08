@@ -15,12 +15,12 @@ export default function Alert() {
     };
 
     useEffect(() => {
-        if (alert) {
+        if (alert !== null) {
             setIsVisible(true);
             const timer = setTimeout(() => {
                 setAlert(null);
                 setIsVisible(false);
-            }, 20000);
+            }, 5000);
             return () => clearTimeout(timer);
         }
     }, [alert]);

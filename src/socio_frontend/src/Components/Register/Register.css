@@ -4,7 +4,7 @@
     left: 40%;
 }
 
-form{
+#register-form{
     width: 80%;
     margin-left: 10%;
     display: flex;
@@ -75,7 +75,7 @@ form{
         text-align: center;
     }
 
-    form{
+    #register-form{
         flex-direction: column;
         border: solid 1px;
         overflow-y: scroll;
@@ -113,7 +113,7 @@ form{
         left: 30%;
     }
 
-    form{
+    #register-details form{
         width: 100%;
         margin-left: 0;
     }

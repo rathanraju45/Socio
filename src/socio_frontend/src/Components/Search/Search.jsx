@@ -9,7 +9,7 @@ import useConvertProfileImages from "../../hooks/useConverProfileImages.js";
 import {useNavigate} from "react-router-dom";
 import Loader from "../Loaders/Loader.jsx";
 
-export default function Search() {
+export default function Search({miscellaneous}) {
 
     const navigate = useNavigate();
 
@@ -105,7 +105,8 @@ export default function Search() {
                                     if (!recentSearches.includes(account)) {
                                         setRecentSearches([...recentSearches, account]);
                                     }
-                                    navigate(`/profile/${account[0].username}`)
+                                    navigate(`/profile/${account[0].username}`);
+                                    miscellaneous(false);
                                 }}>
                                     <img src={account[0].profilePicture} alt={account[0].username}/>
                                     <div className="search-result-account-details">

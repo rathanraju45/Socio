@@ -88,7 +88,7 @@ function Register({setLoading}) {
         });
 
         if (registerResult["ok"]) {
-            setAlert(registerResult["ok"]);
+            setAlert({message:registerResult["ok"],type:"success"});
             setUserDetails({
                 username: username,
                 displayname: displayname,
@@ -108,7 +108,7 @@ function Register({setLoading}) {
                 chatIds: [],
             })
         } else {
-            setAlert(registerResult["err"]);
+            setAlert({message:registerResult["err"],type:"error"});
         }
         setLoading(null);
     };
@@ -127,7 +127,7 @@ function Register({setLoading}) {
     return (
         <>
             <h1 id={"register-details"}>Register with your details</h1>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} id="register-form">
                 <div id="profile-inputs">
                     <img
                         src={profilePicture === null ? default_profile : profilePicture}

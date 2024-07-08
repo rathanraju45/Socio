@@ -6,9 +6,10 @@ import {faImage, faMultiply} from "@fortawesome/free-solid-svg-icons";
 import {GlobalStore} from "../../store/GlobalStore.jsx";
 import useConvertToBinary from "../../hooks/useConverToBinary.js";
 import {v4 as uuidv4} from 'uuid';
+import {ja} from "faker/lib/locales.js";
 
 // eslint-disable-next-line react/prop-types
-export default function Create ({ isOpen, onClose }){
+export default function Create ({ isOpen, onClose, setLoading }){
 
     const {setAlert,actor,setUserDetails} = useContext(GlobalStore);
     const {binary, convertToBinary} = useConvertToBinary();
@@ -29,9 +30,11 @@ export default function Create ({ isOpen, onClose }){
     const handleSubmit = async (e) => {
         e.preventDefault();
         if(binaryFile && caption){
+            setLoading("Uploading...");
             const fileId = uuidv4();
             const uploadDate = new Date();
             let submitRes = await actor.setPost(fileId, binaryFile, caption, uploadDate.toISOString());
+            setLoading(null);
 
             if(submitRes["ok"]){
                 setAlert({message: submitRes["ok"], type: "success"});
