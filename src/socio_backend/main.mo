@@ -313,7 +313,7 @@ actor {
                             notifications = user.notifications;
                             chatIds = user.chatIds;
                         };
-                        let _ = users.put(await whoami(), updatedUser);
+                        let _ = users.put(caller, updatedUser);
                         return #ok("Post added successfully!");
                     };
                     case (_) {
@@ -368,7 +368,7 @@ actor {
                             notifications = user.notifications;
                             chatIds = user.chatIds;
                         };
-                        let _ = users.put(await whoami(), updatedUser);
+                        let _ = users.put(caller, updatedUser);
                         return #ok("Video added successfully!");
                     };
                     case (_) {
