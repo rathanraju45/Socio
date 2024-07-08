@@ -9,7 +9,7 @@ import useConvertProfileImages from "../../hooks/useConverProfileImages.js";
 import {useNavigate} from "react-router-dom";
 import Loader from "../Loaders/Loader.jsx";
 
-export default function Search({miscellaneous}) {
+export default function Search({miscellaneous,setLoading}) {
 
     const navigate = useNavigate();
 
@@ -53,6 +53,10 @@ export default function Search({miscellaneous}) {
     useEffect(() => {
         setFinalFilteredAccounts(updatedAccounts);
     }, [updatedAccounts]);
+
+    useEffect(() => {
+        setLoading(searchTermLoading);
+    }, [searchTermLoading]);
 
     const clearRecentSearch = () => {
         setRecentSearches([]);
@@ -98,7 +102,6 @@ export default function Search({miscellaneous}) {
             ) : (
                 <div className="search-results">
                     {
-                        searchTermLoading ? <Loader loading={"Searching"} />:
                         finalFilteredAccounts.length === 0 ? <h3 id={"no-results"}>No results found</h3> :
                             finalFilteredAccounts.map((account, index) => (
                                 <div key={index} className="search-result-account" onClick={() => {

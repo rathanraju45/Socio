@@ -12,7 +12,7 @@ import {useNavigate, useParams} from "react-router-dom";
 
 import chatIdGenerator from '../../Constants/chatIdGenerator.js';
 
-export default function Profile({typeOfProfile,setSelectedChat}) {
+export default function Profile({typeOfProfile,setSelectedChat,setLoading}) {
 
     const navigate = useNavigate();
 
@@ -163,12 +163,16 @@ export default function Profile({typeOfProfile,setSelectedChat}) {
 
     async function fetchChats(){
         const chatId = chatIdGenerator(userDetails.username, profileUser);
+        setLoading("Loading user details...");
         const profileDetails = await actor.getProfileDetails(profileUser);
+        setLoading(null);
         let chatProfilePic = profileDetails["ok"].profilePicture;
         const arrayBuffer = new Uint8Array(chatProfilePic).buffer;
         const imageBlob = new Blob([arrayBuffer], { type: 'image/jpeg' });
         chatProfilePic = URL.createObjectURL(imageBlob);
+        setLoading("Loading messages...");
         let messages = await actor.getMessages(chatId);
+        setLoading(null);
         setSelectedChat({
             name: profileUser,
             profilePic: chatProfilePic,

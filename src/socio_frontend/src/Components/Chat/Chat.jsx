@@ -32,7 +32,7 @@ import chatIdGenerator from "../../Constants/chatIdGenerator.js";
  * @returns {JSX.Element} The rendered Chat component
  */
 
-export default function Chat({selectedChat, setSelectedChat}) {
+export default function Chat({selectedChat, setSelectedChat, setLoading}) {
 
     // Using the GlobalStore to get the deviceType
     const {darkMode,deviceType, actor, userDetails} = useContext(GlobalStore);
@@ -52,7 +52,9 @@ export default function Chat({selectedChat, setSelectedChat}) {
             const chatPromises = userDetails.chatIds.map(async chatId => {
                 const chatMembers = chatId.split(':');
                 const friendUsername = chatMembers.filter(member => member !== userDetails.username)[0];
+                setLoading("Loading chats...")
                 const profileDetails = await actor.getProfileDetails(friendUsername);
+                setLoading(null);
                 let chatProfilePic = profileDetails["ok"].profilePicture;
                 let messages = await actor.getMessages(chatId);
                 return {friendUsername, chatProfilePic, messages};

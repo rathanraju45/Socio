@@ -30,7 +30,7 @@ import Feed from "../Feed/Feed.jsx";
  * @name MainSection
  * @returns {JSX.Element} The rendered JSX element
  */
-export default function MainSection() {
+export default function MainSection({setLoading}) {
 
     const [selectedChat, setSelectedChat] = useState(null); // The chat that is currently selected
 
@@ -153,10 +153,10 @@ export default function MainSection() {
 
                     </div>
                 }/>
-                <Route path="/chat" element={<Chat selectedChat={selectedChat} setSelectedChat={setSelectedChat} />}/>
+                <Route path="/chat" element={<Chat selectedChat={selectedChat} setSelectedChat={setSelectedChat} setLoading={setLoading} />}/>
                 <Route path="/explore" element={<Explore/>}/>
-                <Route path="/profile" element={<Profile typeOfProfile={"self"} setSelectedChat={setSelectedChat} />}/>
-                <Route path={"/profile/:username"} element={<Profile typeOfProfile={"non-self"} setSelectedChat={setSelectedChat} />}/>
+                <Route path="/profile" element={<Profile typeOfProfile={"self"} setSelectedChat={setSelectedChat} setLoading={setLoading} />}/>
+                <Route path={"/profile/:username"} element={<Profile typeOfProfile={"non-self"} setSelectedChat={setSelectedChat} setLoading={setLoading} />}/>
             </Routes>
         </div>
     )

@@ -150,7 +150,7 @@ export default function App() {
                                                  miscellaneous={setIsMiscellaneousOpen}
                                                  miscellaneousType={setMiscellaneousType}
                                         />}
-                                    <MainSection />
+                                    <MainSection setLoading={setLoading} />
                                     <div id="miscellaneous" ref={miscellaneousRef}
                                          className={miscellaneousType !== '' && isMiscellaneousOpen ? "miscellaneous-open" : "miscellaneous-close"}
                                          style={{
@@ -158,7 +158,7 @@ export default function App() {
                                          }}>
                                         {
                                             isMiscellaneousOpen &&
-                                            miscellaneousType === 'notifications' ? <Notifications/> : <Search miscellaneous={setIsMiscellaneousOpen}/>
+                                            miscellaneousType === 'notifications' ? <Notifications miscellaneous={setIsMiscellaneousOpen} setLoading={setLoading}/> : <Search miscellaneous={setIsMiscellaneousOpen} setLoading={setLoading}/>
                                         }
                                     </div>
                                     {deviceType === 'mobile' &&

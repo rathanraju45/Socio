@@ -5,14 +5,13 @@ import {GlobalStore} from "../../store/GlobalStore.jsx";
 import useConvertNotificationProfiles from "../../hooks/useConvertNotificationProfiles.js";
 import {useNavigate} from "react-router-dom";
 
-export default function Notifications() {
+export default function Notifications({miscellaneous,setLoading}) {
 
     const navigate = useNavigate();
 
     const {actor, userDetails} = useContext(GlobalStore);
     const [tempNotifications, setTempNotifications] = useState([]);
     const [notifications, setNotifications] = useState([]);
-
     const {updatedNotifications, convertNotifications} = useConvertNotificationProfiles();
 
     useEffect(() => {
@@ -31,6 +30,7 @@ export default function Notifications() {
         const fetchNotifications = async () => {
             if (userDetails.notifications.length !== 0) {
                 let finalNotifications = [];
+                setLoading("Loading Notifications");
                 for (const notification of userDetails.notifications) {
                     let res = await actor.getProfileDetails(notification.from);
                     let notificationItem = {
@@ -43,6 +43,7 @@ export default function Notifications() {
                     };
                     finalNotifications.push(notificationItem);
                 }
+                setLoading(null);
                 setTempNotifications(finalNotifications);
             }
         };
@@ -78,6 +79,7 @@ export default function Notifications() {
                 {notifications.length !== 0 ? notifications.map((notification, index) => (
                     <div key={index} className="notification-item" onClick={() => {
                         navigate(`/profile/${notification.from}`)
+                        miscellaneous(false);
                     }}>
                         <img src={notification.profilePic} alt="user avatar" className="avatar"/>
                         <div className="notification-text">
