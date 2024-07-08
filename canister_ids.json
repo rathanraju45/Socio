@@ -5,6 +5,9 @@
   "socio_frontend": {
     "ic": "nhn43-cqaaa-aaaap-qhnwq-cai"
   },
+  "socio_messages_storage": {
+    "ic": "ol2mm-jqaaa-aaaap-qhn4q-cai"
+  },
   "socio_storage": {
     "ic": "nooxh-uyaaa-aaaap-qhnxa-cai"
   }

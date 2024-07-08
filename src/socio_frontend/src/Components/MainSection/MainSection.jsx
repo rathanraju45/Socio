@@ -102,7 +102,6 @@ export default function MainSection() {
         profilePic: `https://randomuser.me/api/portraits/${i % 2 === 0 ? 'men' : 'women'}/${getRandomInt(1, 99)}.jpg`,
     }));
 
-
     /**
      * The `MainSection` component return statement.
      * It returns a div with a dynamic class based on the `sideBarMinimized` state and a child h2 element.

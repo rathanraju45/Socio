@@ -16,6 +16,7 @@ form{
     width: 300px;
     border-radius: 50%;
     border: 2px solid #333;
+    aspect-ratio: 1 / 1;
 }
 
 #update-profile-pic{
@@ -62,4 +63,70 @@ form{
     color: red !important;
     font-size: 15px;
     text-align: center;
+}
+
+@media screen and (max-width: 767px){
+
+    #register-details{
+        position: relative;
+        top: 0;
+        left: 0;
+        font-size: 20px;
+        text-align: center;
+    }
+
+    form{
+        flex-direction: column;
+        border: solid 1px;
+        overflow-y: scroll;
+        width: 100%;
+        margin-left: 0;
+        justify-content: space-between;
+    }
+
+    #profile-inputs{
+        display: flex;
+        flex-direction: column;
+    }
+
+    #profile-inputs img{
+        width: 100px;
+        margin: auto;
+    }
+
+    form > div{
+        width: 95% !important;
+    }
+
+    #text-inputs{
+        margin-left: 0;
+    }
+
+    #text-inputs input,#text-inputs textarea{
+        margin-left: 0;
+    }
+
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px){
+    #register-details{
+        left: 30%;
+    }
+
+    form{
+        width: 100%;
+        margin-left: 0;
+    }
+
+    #profile-inputs{
+    }
+
+    #profile-inputs img{
+        width: 200px;
+    }
+
+    #text-inputs{
+        width: 50%;
+    }
+
 }

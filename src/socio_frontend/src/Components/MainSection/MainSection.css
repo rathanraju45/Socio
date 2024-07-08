@@ -67,6 +67,7 @@
     height: 40px;
     border-radius: 50%;
     margin: 0 10px;
+    aspect-ratio: 1 / 1;
 }
 
 .profile-content span{
@@ -113,6 +114,7 @@
     height: 40px;
     border-radius: 50%;
     margin: 0 10px;
+    aspect-ratio: 1 / 1;
 }
 
 .suggestion p{

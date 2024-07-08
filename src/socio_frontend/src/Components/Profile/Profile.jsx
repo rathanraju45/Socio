@@ -315,7 +315,7 @@ export default function Profile({typeOfProfile,setSelectedChat}) {
                                                         </div>
                                                         <div onClick={() => {
                                                             navigate('/chat');
-                                                            setSelectedChat(profileUser);
+                                                            fetchChats();
                                                         }}>Message
                                                         </div>
                                                     </> : <div>Edit profile</div>

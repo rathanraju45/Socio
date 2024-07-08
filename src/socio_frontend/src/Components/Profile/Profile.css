@@ -54,6 +54,7 @@
     background-origin: border-box;
     background-clip: content-box, border-box;
     box-decoration-break: clone;
+    aspect-ratio: 1 / 1;
 }
 
 #profile-stats {
@@ -110,6 +111,7 @@
 .highlight-image > img{
     width: 100%;
     border-radius: 50%;
+    aspect-ratio: 1 / 1;
 }
 
 #profile-bottom-container {
@@ -162,6 +164,7 @@
 .profile-post img {
     width: 100%;
     object-fit: cover;
+    aspect-ratio: 1 / 1;
 }
 
 #no-posts{

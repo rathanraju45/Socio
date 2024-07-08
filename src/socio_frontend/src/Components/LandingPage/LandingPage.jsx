@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import './LandingPage.css';
 import socio_logo from "../../../public/images/large_logos/black_theme_full.png";
 import socio_media_illustration from "../../../public/images/illustrations/Social media-amico.png";
@@ -22,12 +22,14 @@ import crewsphere from "../../../public/images/icp_images/crewshpere.png";
 
 import Login from "../Login/Login.jsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlay} from "@fortawesome/free-solid-svg-icons";
+import {faBars, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {GlobalStore} from "../../store/GlobalStore.jsx";
 
 const LandingPage = ({setLoading}) => {
 
-    const {setDarkMode} = useContext(GlobalStore);
+    const {setDarkMode,deviceType} = useContext(GlobalStore);
+
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
         setDarkMode(true);
@@ -40,16 +42,29 @@ const LandingPage = ({setLoading}) => {
         <div className="landing-page">
 
             <nav className="navbar">
-
-                <img src={socio_logo} alt={"socio_logo"}/>
-
-                <ul>
-                    <li><a href="#Home">Home</a></li>
-                    <li><a href="#about-us-text">About</a></li>
-                    <li><a href="#features-text">Features</a></li>
-                    <li><a href="#Team">Team</a></li>
-                </ul>
-
+                <img src={socio_logo} alt="socio_logo"/>
+                {deviceType === "mobile" ? (
+                    <>
+                        <button className="hamburger" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                            <FontAwesomeIcon icon={faBars}/>
+                        </button>
+                        {isMenuOpen && (
+                            <ul className="menu">
+                                <li><a href="#Home">Home</a></li>
+                                <li><a href="#about-us-text">About</a></li>
+                                <li><a href="#features-text">Features</a></li>
+                                <li><a href="#Team">Team</a></li>
+                            </ul>
+                        )}
+                    </>
+                ) : (
+                    <ul>
+                        <li><a href="#Home">Home</a></li>
+                        <li><a href="#about-us-text">About</a></li>
+                        <li><a href="#features-text">Features</a></li>
+                        <li><a href="#Team">Team</a></li>
+                    </ul>
+                )}
             </nav>
 
             <section id="Home" className="middle-section">
@@ -58,9 +73,9 @@ const LandingPage = ({setLoading}) => {
                     <h1 id={"main-heading"}>Socio</h1>
                     <p id={"tagline"}>Privacy Even while Social.</p>
                     <div id="sign-options">
-                        <Login setLoading={setLoading} />
+                        <Login setLoading={setLoading}/>
                         <button id="Watch-tutorial">
-                            How to <FontAwesomeIcon id={"watch-tutorial-icon"} icon={faPlay} />
+                            How to <FontAwesomeIcon id={"watch-tutorial-icon"} icon={faPlay}/>
                         </button>
                     </div>
                 </div>

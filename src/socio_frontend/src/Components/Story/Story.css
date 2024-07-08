@@ -19,6 +19,7 @@
     background-clip: content-box, border-box;
     box-decoration-break: clone;
     padding: 1px;
+    aspect-ratio: 1 / 1;
 }
 
 .story img {
@@ -27,6 +28,7 @@
     height: 100%;
     object-fit: cover;
     z-index: 1;
+    aspect-ratio: 1 / 1;
 }
 
 .story-item p {
