@@ -38,9 +38,10 @@ import {
     faToggleOn,
     faToggleOff,
     faExchangeAlt,
-    faCog
+    faCog, faArrowRightFromBracket
 } from '@fortawesome/free-solid-svg-icons';
 import {GlobalStore} from "../../store/GlobalStore.jsx";
+import {AuthClient} from "@dfinity/auth-client";
 
 /**
  * The `SideBar` functional component.
@@ -55,7 +56,7 @@ export default function SideBar({miscellaneous, miscellaneousType, handleCreateO
 
     const navigate = useNavigate();
 
-    const {darkMode, toggleDarkMode, sideBarMinimized, toggleSideBar, deviceType} = useContext(GlobalStore); // Access the dark mode state from the global store
+    const {darkMode, toggleDarkMode, sideBarMinimized, toggleSideBar, deviceType, setLoggedIn} = useContext(GlobalStore); // Access the dark mode state from the global store
     const [notificationCount, setNotificationCount] = useState(0);
     const [isNewNotification, setIsNewNotification] = useState(false);
     const [chatCount, setChatCount] = useState(0);
@@ -220,6 +221,15 @@ export default function SideBar({miscellaneous, miscellaneousType, handleCreateO
                         }}>
                             <FontAwesomeIcon icon={darkMode ? faToggleOn : faToggleOff}/>
                             {!sideBarMinimized && <p>{darkMode ? 'Light Mode' : 'Dark Mode'}</p>}
+                        </div>
+                        <div className="modal-item" onClick={async () => {
+                            const authClient = await AuthClient.create();
+                            await authClient.logout();
+                            navigate('/');
+                            setLoggedIn(false);
+                        }}>
+                            <FontAwesomeIcon icon={faArrowRightFromBracket} />
+                            <p>Log Out</p>
                         </div>
                     </div>
                 )}

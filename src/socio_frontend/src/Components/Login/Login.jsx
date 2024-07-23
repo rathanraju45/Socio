@@ -47,7 +47,7 @@ export default function Login({setLoading}) {
 
         setActor(actor);
         setLoginError(null);
-        await getIdentity();
+        await getIdentity(actor);
         setLoggedIn(true);
         setLoading(null);
     }
