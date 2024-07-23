@@ -1,12 +1,23 @@
 // eslint-disable-next-line no-unused-vars
-import React from 'react';
+import React, {useContext} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faSearch, faPlusSquare, faCompass, faUser } from '@fortawesome/free-solid-svg-icons';
+import {
+    faHome,
+    faSearch,
+    faPlusSquare,
+    faCompass,
+    faUser,
+    faArrowRightFromBracket
+} from '@fortawesome/free-solid-svg-icons';
 import './NavBar.css';
-import {useNavigate} from "react-router-dom"; // Assuming you have a CSS file for styling
+import {useNavigate} from "react-router-dom";
+import {AuthClient} from "@dfinity/auth-client";
+import {GlobalStore} from "../../store/GlobalStore.jsx"; // Assuming you have a CSS file for styling
 
 // eslint-disable-next-line react/prop-types
 function NavBar({miscellaneous, miscellaneousType, handleCreateOpenModal,setSelectedChat}) {
+
+    const {setLoggedIn} = useContext(GlobalStore);
 
     const navigate = useNavigate()
 
@@ -35,6 +46,12 @@ function NavBar({miscellaneous, miscellaneousType, handleCreateOpenModal,setSele
                 miscellaneous(false);
                 navigate('/profile');
                 setSelectedChat(null);
+            }} />
+            <FontAwesomeIcon icon={faArrowRightFromBracket} onClick={async () => {
+                const authClient = await AuthClient.create();
+                await authClient.logout();
+                navigate('/');
+                setLoggedIn(false);
             }} />
         </div>
     );
