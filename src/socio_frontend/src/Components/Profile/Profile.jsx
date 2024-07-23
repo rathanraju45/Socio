@@ -2,7 +2,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import './Profile.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBookmark, faFilm, faImage, faPlus, faTag} from "@fortawesome/free-solid-svg-icons";
+import {faBookmark, faFilm, faImage, faPlus, faTag, faThumbsDown, faThumbsUp} from "@fortawesome/free-solid-svg-icons";
 
 import {GlobalStore} from "../../store/GlobalStore.jsx";
 import useConvertToImage from "../../hooks/useConvertToImage.js";
@@ -11,8 +11,9 @@ import useConvertPostsImages from "../../hooks/useConvertPostsImages.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 
 import chatIdGenerator from '../../Constants/chatIdGenerator.js';
+import PostModal from "../PostModal/PostModal.jsx";
 
-export default function Profile({typeOfProfile,setSelectedChat,setLoading}) {
+export default function Profile({typeOfProfile, setSelectedChat, setLoading}) {
 
     const navigate = useNavigate();
 
@@ -31,26 +32,25 @@ export default function Profile({typeOfProfile,setSelectedChat,setLoading}) {
     const [profileLoading, setProfileLoading] = useState(false);
     const [postsLoading, setPostsLoading] = useState(false);
 
-    function loadProfile(){
+    const [selectedPost, setSelectedPost] = useState(null);
+    const [selectedPostId, setSelectedPostId] = useState(null);
+
+    function loadProfile() {
         setProfileLoading(true);
 
-        if(typeOfProfile === "self"){
+        if (typeOfProfile === "self") {
             setProfile(userDetails);
             setPostAddresses(userDetails.posts);
             convertToImage(userDetails.profilePicture);
             setProfileLoading(false);
-        }
-
-        else if(typeOfProfile === "non-self" && userDetails.username === profileUser){
+        } else if (typeOfProfile === "non-self" && userDetails.username === profileUser) {
             setProfile(userDetails);
             setPostAddresses(userDetails.posts);
             convertToImage(userDetails.profilePicture);
             setProfileLoading(false);
-        }
-
-        else{
+        } else {
             async function getProfile() {
-                    return await actor.getProfileDetails(profileUser);
+                return await actor.getProfileDetails(profileUser);
             }
 
             getProfile().then(r => {
@@ -65,7 +65,7 @@ export default function Profile({typeOfProfile,setSelectedChat,setLoading}) {
 
     useEffect(() => {
         loadProfile();
-    }, [typeOfProfile,userDetails]);
+    }, [typeOfProfile, userDetails]);
 
     useEffect(() => {
         setProfile(prevProfile => ({
@@ -115,60 +115,63 @@ export default function Profile({typeOfProfile,setSelectedChat,setLoading}) {
     async function sendFriendRequest(username) {
         const date = new Date();
         const chatId = chatIdGenerator(userDetails.username, username);
-        const res = await actor.sendFriendRequest(username,date.toISOString(),chatId);
-        if(res["ok"]){
+        const res = await actor.sendFriendRequest(username, date.toISOString(), chatId);
+        if (res["ok"]) {
             setAlert({
                 message: res["ok"],
                 type: "success"
             })
-        } else{
+        } else {
             setAlert({
                 message: res["err"],
                 type: "error"
             })
         }
+        return res;
     }
 
     async function acceptFriendRequest(username) {
         const date = new Date();
         const chatId = chatIdGenerator(userDetails.username, username);
-        let res = await actor.acceptFriendRequest(username, date.toISOString(),chatId);
-        if(res["ok"]){
+        let res = await actor.acceptFriendRequest(username, date.toISOString(), chatId);
+        if (res["ok"]) {
             setAlert({
                 message: res["ok"],
                 type: "success"
             })
-        } else{
+        } else {
             setAlert({
                 message: res["err"],
                 type: "error"
             })
         }
+        return res;
     }
 
     async function unFollow(username) {
         let res = await actor.unFollow(username);
-        if(res["ok"]){
+        if (res["ok"]) {
             setAlert({
                 message: res["ok"],
                 type: "success"
             })
-        } else{
+        } else {
             setAlert({
                 message: res["err"],
                 type: "error"
             })
         }
+        return res;
     }
 
-    async function fetchChats(){
+    async function fetchChats() {
         const chatId = chatIdGenerator(userDetails.username, profileUser);
         setLoading("Loading user details...");
         const profileDetails = await actor.getProfileDetails(profileUser);
         setLoading(null);
         let chatProfilePic = profileDetails["ok"].profilePicture;
         const arrayBuffer = new Uint8Array(chatProfilePic).buffer;
-        const imageBlob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+        const imageBlob = new Blob([arrayBuffer], {type: 'image/jpeg'});
         chatProfilePic = URL.createObjectURL(imageBlob);
         setLoading("Loading messages...");
         let messages = await actor.getMessages(chatId);
@@ -181,8 +184,70 @@ export default function Profile({typeOfProfile,setSelectedChat,setLoading}) {
         })
     }
 
+    const handleReaction = async (reactionType) => {
+        let postIndex = selectedPostId;
+        const post = finalPosts[postIndex];
+        const isLiked = post.likes.includes(userDetails.username);
+        const isDisliked = post.dislikes.includes(userDetails.username);
+
+        // Optimistically update the UI
+        let updatedLikes = [...post.likes];
+        let updatedDislikes = [...post.dislikes];
+        if (reactionType === "like") {
+            if (isLiked) {
+                updatedLikes = updatedLikes.filter(user => user !== userDetails.username);
+            } else {
+                updatedLikes.push(userDetails.username);
+                updatedDislikes = updatedDislikes.filter(user => user !== userDetails.username);
+            }
+        } else if (reactionType === "dislike") {
+            if (isDisliked) {
+                updatedDislikes = updatedDislikes.filter(user => user !== userDetails.username);
+            } else {
+                updatedDislikes.push(userDetails.username);
+                updatedLikes = updatedLikes.filter(user => user !== userDetails.username);
+            }
+        }
+
+        // Apply optimistic updates
+        let previousPosts = [...finalPosts]; // Save previous state for potential rollback
+        let previousSelectedPost = {...selectedPost}; // Save previous selected post state
+        setFinalPosts(prevPosts => {
+            const updatedPosts = [...prevPosts];
+            updatedPosts[postIndex] = {
+                ...post,
+                likes: updatedLikes,
+                dislikes: updatedDislikes
+            };
+            return updatedPosts;
+        });
+        setSelectedPost(prevPost => ({
+            ...prevPost,
+            likes: updatedLikes,
+            dislikes: updatedDislikes
+        }));
+
+        // Backend call
+        let res = await actor.reactPost(postAddresses[postIndex], userDetails.username, reactionType);
+        if (res["err"]) {
+            // Revert to previous state in case of error
+            setFinalPosts(previousPosts);
+            setSelectedPost(previousSelectedPost);
+            setAlert("Error reacting to post");
+        }
+        // No need to handle success explicitly, as UI has been optimistically updated
+    };
+
     return (
         <>
+            {
+                selectedPost !== null &&
+                <PostModal post={selectedPost} onClose={setSelectedPost} handleReaction={handleReaction} username={
+                    typeOfProfile === "self" ? userDetails.username : profileUser
+                } profilePicture={
+                    profile.profilePicture
+                }/>
+            }
             {
                 !profileLoading && profile
                     ?
@@ -206,41 +271,51 @@ export default function Profile({typeOfProfile,setSelectedChat,setLoading}) {
                                                 <div>Edit profile</div>
                                             ) : (
                                                 userDetails.username !== profileUser ?
-                                                <>
-                                                    <div onClick={() => {
-                                                        if (userDetails.friendRequests.includes(profileUser)) {
-                                                            acceptFriendRequest(profileUser);
-                                                            setUserDetails(prevUserDetails => ({
-                                                                ...prevUserDetails,
-                                                                following: prevUserDetails.following + BigInt(1),
-                                                                friendRequests: prevUserDetails.friendRequests.filter(user => user !== profileUser),
-                                                                followingList: [...prevUserDetails.followingList, profileUser]
-                                                            }));
-                                                        } else if (userDetails.followingList.includes(profileUser)) {
-                                                            unFollow(profileUser);
-                                                            setUserDetails(prevUserDetails => ({
-                                                                ...prevUserDetails,
-                                                                following: prevUserDetails.following - BigInt(1),
-                                                                followingList: prevUserDetails.followingList.filter(user => user !== profileUser)
-                                                            }));
-                                                        } else {
-                                                            sendFriendRequest(profileUser);
-                                                            setUserDetails(prevUserDetails => ({
-                                                                ...prevUserDetails,
-                                                                following: prevUserDetails.following + BigInt(1),
-                                                                followingList: [...prevUserDetails.followingList, profileUser]
-                                                            }));
-                                                        }
-                                                    }}>
-                                                        {
-                                                            userDetails.friendRequests.includes(profileUser) ? "Follow Back" : userDetails.followingList.includes(profileUser) ? "Following" : "Follow"
-                                                        }
-                                                    </div>
-                                                    <div onClick={() => {
-                                                        navigate('/chat');
-                                                        fetchChats();
-                                                    }}>Message</div>
-                                                </> : <div>Edit profile</div>
+                                                    <>
+                                                        <div onClick={() => {
+                                                            if (userDetails.friendRequests.includes(profileUser)) {
+                                                                acceptFriendRequest(profileUser).then((r) => {
+                                                                    if (r["ok"]) {
+                                                                        setUserDetails(prevUserDetails => ({
+                                                                            ...prevUserDetails,
+                                                                            following: prevUserDetails.following + BigInt(1),
+                                                                            friendRequests: prevUserDetails.friendRequests.filter(user => user !== profileUser),
+                                                                            followingList: [...prevUserDetails.followingList, profileUser]
+                                                                        }));
+                                                                    }
+                                                                });
+                                                            } else if (userDetails.followingList.includes(profileUser)) {
+                                                                unFollow(profileUser).then((r) => {
+                                                                    if (r["ok"]) {
+                                                                        setUserDetails(prevUserDetails => ({
+                                                                            ...prevUserDetails,
+                                                                            following: prevUserDetails.following - BigInt(1),
+                                                                            followingList: prevUserDetails.followingList.filter(user => user !== profileUser)
+                                                                        }));
+                                                                    }
+                                                                });
+                                                            } else {
+                                                                sendFriendRequest(profileUser).then((r) => {
+                                                                    if (r["ok"]) {
+                                                                        setUserDetails(prevUserDetails => ({
+                                                                            ...prevUserDetails,
+                                                                            following: prevUserDetails.following + BigInt(1),
+                                                                            followingList: [...prevUserDetails.followingList, profileUser]
+                                                                        }));
+                                                                    }
+                                                                });
+                                                            }
+                                                        }}>
+                                                            {
+                                                                userDetails.friendRequests.includes(profileUser) ? "Follow Back" : userDetails.followingList.includes(profileUser) ? "Following" : "Follow"
+                                                            }
+                                                        </div>
+                                                        <div onClick={() => {
+                                                            navigate('/chat');
+                                                            fetchChats();
+                                                        }}>Message
+                                                        </div>
+                                                    </> : <div>Edit profile</div>
 
                                             )}
                                         </div>
@@ -406,8 +481,22 @@ export default function Profile({typeOfProfile,setSelectedChat,setLoading}) {
                                             finalPosts.length !== 0 ?
                                                 finalPosts.map((post, index) => {
                                                     return (
-                                                        <div key={index} className="profile-post">
+                                                        <div key={index} className="profile-post"
+                                                             onClick={() => {
+                                                                 setSelectedPost(post)
+                                                                 setSelectedPostId(index)
+                                                             }}>
                                                             <img src={post.img} alt="Post"/>
+                                                            <div className="profile-post-overlay">
+                                                                <div
+                                                                    className={`${post.likes.includes(userDetails.username) ? "active-action " : ""}` + "post-like-count"}>
+                                                                    <FontAwesomeIcon icon={faThumbsUp}/>
+                                                                    <span>{post.likes.length}</span></div>
+                                                                <div
+                                                                    className={`${post.dislikes.includes(userDetails.username) ? "active-action " : ""}` + "post-dislike-count"}>
+                                                                    <FontAwesomeIcon icon={faThumbsDown}/>
+                                                                    <span>{post.dislikes.length}</span></div>
+                                                            </div>
                                                         </div>
                                                     )
                                                 })

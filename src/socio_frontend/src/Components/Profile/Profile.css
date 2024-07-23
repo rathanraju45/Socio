@@ -159,12 +159,42 @@
     height: 0;
     padding-bottom: 100%;
     border: solid 1px white;
+    position: relative;
+    overflow: hidden;
 }
 
 .profile-post img {
     width: 100%;
     object-fit: cover;
     aspect-ratio: 1 / 1;
+}
+
+.profile-post-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+    color: white;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.post-like-count,.post-dislike-count{
+    font-size: 30px;
+}
+
+.profile-post:hover .profile-post-overlay {
+    opacity: 1;
+}
+
+.active-action svg {
+    color: #f1c40f !important;
 }
 
 #no-posts{
@@ -261,6 +291,10 @@
     #profile-posts-container {
         grid-template-columns: repeat(3, 1fr);
         gap: 5px;
+    }
+
+    .post-like-count,.post-dislike-count{
+        font-size: 20px;
     }
 
 }

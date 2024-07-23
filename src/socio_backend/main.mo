@@ -6,6 +6,7 @@ import Result "mo:base/Result";
 import Blob "mo:base/Blob";
 import Array "mo:base/Array";
 import Bool "mo:base/Bool";
+import Debug "mo:base/Debug";
 import storage "canister:socio_storage";
 import messages "canister:socio_messages_storage";
 
@@ -64,16 +65,27 @@ actor {
         #err : Err;
     };
 
+    type comment = {
+        username : Text;
+        comment : Text;
+    };
+
     type Post = {
         img : Blob;
         caption : Text;
         date : Text;
+        likes: [Text];
+        dislikes: [Text];
+        comments: [comment];
     };
 
     type Video = {
         video : Blob;
         caption : Text;
         date : Text;
+        likes: [Text];
+        dislikes: [Text];
+        comments: [comment];
     };
 
     type Message = {
@@ -145,6 +157,18 @@ actor {
             };
             case (?userDetails) {
                 return #ok(userDetails);
+            };
+        };
+    };
+
+    public shared (msg) func getUserNotifications() : async Result<[Notification], Text> {
+        let caller = msg.caller;
+        switch (users.get(caller)) {
+            case null {
+                return #err("User does not exist.");
+            };
+            case (?userDetails) {
+                return #ok(userDetails.notifications);
             };
         };
     };
@@ -330,6 +354,15 @@ actor {
         };
     };
 
+    public func reactPost(id: Text,username:Text,typeofReact:Text) : async Result<Text, Text> {
+        let res = await storage.reactPost(id,username,typeofReact);
+        if(res == "no post found"){
+            return #err("Post not found");
+        } else{
+            return #ok("Reacted");
+        };
+    };
+
     public func getVideo(id : Text) : async Result<Video, Text> {
         let video = await storage.getVideo(id);
         switch (video) {
@@ -436,6 +469,14 @@ actor {
                             let friend = users.get(friendPrincipal);
                             switch (friend) {
                                 case (?userDetails) {
+                                    var newFriendRequests = userDetails.friendRequests;
+                                    var message = "";
+                                    if(Array.find(userDetails.followerList, func(follower : Text) : Bool { follower == callerUserName }) == null) {
+                                        newFriendRequests := Array.append(newFriendRequests, [callerUserName]);
+                                        message := " sent you a friend request.";
+                                    } else{
+                                        message := " Started following you.";
+                                    };
                                     let updatedUser = {
                                         username = userDetails.username;
                                         displayname = userDetails.displayname;
@@ -446,12 +487,12 @@ actor {
                                         postsCount = userDetails.postsCount;
                                         followerList = Array.append(userDetails.followerList, [callerUserName]);
                                         followingList = userDetails.followingList;
-                                        friendRequests = Array.append(userDetails.friendRequests, [callerUserName]);
+                                        friendRequests = newFriendRequests;
                                         posts = userDetails.posts;
                                         reels = userDetails.reels;
                                         tagged = userDetails.tagged;
                                         saved = userDetails.saved;
-                                        notifications = Array.append(userDetails.notifications, [{ notificationType = "Friend Request"; message = " sent you a friend request."; addresses = ""; date = date; from = callerUserName }]);
+                                        notifications = Array.append(userDetails.notifications, [{ notificationType = "Friend Request"; message = message; addresses = ""; date = date; from = callerUserName }]);
                                         chatIds = userDetails.chatIds;
                                     };
                                     let _ = users.put(friendPrincipal, updatedUser);
@@ -470,8 +511,8 @@ actor {
                     return #err("Error sending friend request.");
                 };
             };
-            case "err" {
-                return #err("Error creating chat id. Try again.");
+            case ("err"){
+                return #err("Error creating chat id.");
             };
             case _ {
                 return #err("Unexpected Error. Try again.");
@@ -653,9 +694,12 @@ actor {
             case (#ok("Chat id created")) {
                 return "ok";
             };
-            case _ {
-                return "null";
+            case (#err("Chat id already exists")) {
+                return "ok";
             };
+            case (_) {
+                return "_";
+            }
         };
     };
 

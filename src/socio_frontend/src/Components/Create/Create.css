@@ -12,7 +12,6 @@
     z-index: 1000;
     border: solid 1px white;
     border-radius: 10px;
-
     transform: rotateX(5deg) rotateY(5deg);
 }
 

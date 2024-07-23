@@ -46,6 +46,8 @@ export default function App() {
 
     const miscellaneousRef = useRef(null);
 
+    const [selectedChat, setSelectedChat] = useState(null); // The chat that is currently selected
+
     // Accessing the dark mode and device type from store.
     const {
         darkMode,
@@ -59,6 +61,8 @@ export default function App() {
         setUserDetails
     } = useContext(GlobalStore); // Using the useContext hook to access the `darkMode` and `deviceType` states from the GlobalStore
     const location = useLocation();
+
+    const [isUserDetailsLoading, setIsUserDetailsLoading] = useState(false);
 
     const [isCreateModalOpen, setIscCreateModalOpen] = useState(false);
     const handleCreateOpenModal = () => {
@@ -90,21 +94,72 @@ export default function App() {
     const [isMiscellaneousOpen, setIsMiscellaneousOpen] = useState(false);
     const [miscellaneousType, setMiscellaneousType] = useState('');
 
-    useEffect(() => {
-        async function getUserDetails() {
-            return (await actor.getUserDetails());
+    function deepEqual(object1, object2) {
+        const keys1 = Object.keys(object1);
+        const keys2 = Object.keys(object2);
+
+        if (keys1.length !== keys2.length) {
+            return false;
         }
 
-        if (identity !== null) {
-            getUserDetails().then(r => {
-                if (r["err"]) {
-                    setUserDetails(null);
-                } else {
-                    setUserDetails(r["ok"]);
-                }
-            });
+        for (const key of keys1) {
+            const val1 = object1[key];
+            const val2 = object2[key];
+            const areObjects = isObject(val1) && isObject(val2);
+            if (
+                areObjects && !deepEqual(val1, val2) ||
+                !areObjects && val1 !== val2
+            ) {
+                return false;
+            }
         }
-    }, [identity]);
+
+        return true;
+    }
+
+    function isObject(object) {
+        return object != null && typeof object === 'object';
+    }
+
+    useEffect(() => {
+        if (identity !== null) {
+            async function fetchDetails() {
+                return await actor.getUserDetails();
+            }
+
+            if (userDetails !== null) {
+                const intervalId = setInterval(async () => {
+                    if (identity !== null) {
+                        const fetchedDetails = await fetchDetails();
+                        if (fetchedDetails["err"]) {
+                            setUserDetails(null);
+                        } else {
+                            if (!deepEqual(userDetails, fetchedDetails["ok"])) {
+                                setUserDetails(fetchedDetails["ok"]);
+                            }
+                        }
+                    }
+                }, 3000);
+
+                return () => clearInterval(intervalId);
+            } else {
+                async function fetchInitialDetails() {
+                    setIsUserDetailsLoading(true);
+                    const fetchedDetails = await fetchDetails();
+                    if (fetchedDetails["err"]) {
+                        return null;
+                    } else {
+                        return fetchedDetails["ok"];
+                    }
+                }
+
+                fetchInitialDetails().then(r => {
+                    setIsUserDetailsLoading(false);
+                    setUserDetails(r);
+                });
+            }
+        }
+    }, [identity, userDetails]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -134,9 +189,11 @@ export default function App() {
 
             {
                 loggedIn ?
+                    isUserDetailsLoading ? <Loader loading={"Fetching User Details"}/> :
                     userDetails === null ? <Register setLoading={setLoading}/> :
                         <>
-                            <Create isOpen={isCreateModalOpen} onClose={handleCreateCloseModal} setLoading={setLoading}/>
+                            <Create isOpen={isCreateModalOpen} onClose={handleCreateCloseModal}
+                                    setLoading={setLoading}/>
 
                             {
                                 <>
@@ -149,8 +206,9 @@ export default function App() {
                                                  handleCreateCloseModal={handleCreateCloseModal}
                                                  miscellaneous={setIsMiscellaneousOpen}
                                                  miscellaneousType={setMiscellaneousType}
+                                                 setSelectedChat={setSelectedChat}
                                         />}
-                                    <MainSection setLoading={setLoading} />
+                                    <MainSection setLoading={setLoading} selectedChat={selectedChat} setSelectedChat={setSelectedChat}/>
                                     <div id="miscellaneous" ref={miscellaneousRef}
                                          className={miscellaneousType !== '' && isMiscellaneousOpen ? "miscellaneous-open" : "miscellaneous-close"}
                                          style={{
@@ -158,13 +216,17 @@ export default function App() {
                                          }}>
                                         {
                                             isMiscellaneousOpen &&
-                                            miscellaneousType === 'notifications' ? <Notifications miscellaneous={setIsMiscellaneousOpen} setLoading={setLoading}/> : <Search miscellaneous={setIsMiscellaneousOpen} setLoading={setLoading}/>
+                                            miscellaneousType === 'notifications' ?
+                                                <Notifications miscellaneous={setIsMiscellaneousOpen}
+                                                               setLoading={setLoading}/> :
+                                                <Search miscellaneous={setIsMiscellaneousOpen} setLoading={setLoading}/>
                                         }
                                     </div>
                                     {deviceType === 'mobile' &&
                                         <NavBar handleCreateOpenModal={handleCreateOpenModal}
                                                 miscellaneous={setIsMiscellaneousOpen}
                                                 miscellaneousType={setMiscellaneousType}
+                                                setSelectedChat={setSelectedChat}
                                         />}
                                 </>
                             }

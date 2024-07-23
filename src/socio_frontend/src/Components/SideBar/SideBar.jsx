@@ -51,7 +51,7 @@ import {GlobalStore} from "../../store/GlobalStore.jsx";
  */
 
 // eslint-disable-next-line react/prop-types
-export default function SideBar({miscellaneous, miscellaneousType, handleCreateOpenModal}) {
+export default function SideBar({miscellaneous, miscellaneousType, handleCreateOpenModal,setSelectedChat}) {
 
     const navigate = useNavigate();
 
@@ -100,7 +100,6 @@ export default function SideBar({miscellaneous, miscellaneousType, handleCreateO
     return (
         <div className={`sidebar ${sideBarMinimized ? 'minimized' : ''}`}>
 
-
             <img className={"sidebar-logo"}
                  src={
                      sideBarMinimized
@@ -115,6 +114,7 @@ export default function SideBar({miscellaneous, miscellaneousType, handleCreateO
                      navigate('/');
                      deviceType !== 'tablet' && toggleSideBar(false);
                      miscellaneous(false);
+                     setSelectedChat(null);
                  }}>
                 <FontAwesomeIcon icon={faHome}/>
                 {!sideBarMinimized && <p>Home</p>}
@@ -125,6 +125,7 @@ export default function SideBar({miscellaneous, miscellaneousType, handleCreateO
                      deviceType !== 'tablet' && toggleSideBar(true);
                      miscellaneous(true);
                      miscellaneousType('search');
+                     setSelectedChat(null);
                  }}>
                 <FontAwesomeIcon icon={faSearch}/>
                 {!sideBarMinimized && <p>Search</p>}
@@ -146,6 +147,7 @@ export default function SideBar({miscellaneous, miscellaneousType, handleCreateO
                      navigate('/explore');
                      deviceType !== 'tablet' && toggleSideBar(true);
                      miscellaneous(false);
+                     setSelectedChat(null);
                  }}>
                 <FontAwesomeIcon icon={faCompass}/>
                 {!sideBarMinimized && <p>Explore</p>}
@@ -156,6 +158,7 @@ export default function SideBar({miscellaneous, miscellaneousType, handleCreateO
                      deviceType !== 'tablet' && toggleSideBar(true);
                      miscellaneous(true);
                      miscellaneousType('notifications');
+                     setSelectedChat(null);
                  }}>
                 <div className={isNewNotification ? 'new-notification' : ''}>
                     <FontAwesomeIcon icon={faBell}/>
@@ -179,6 +182,7 @@ export default function SideBar({miscellaneous, miscellaneousType, handleCreateO
                      navigate('/profile');
                      deviceType !== 'tablet' && toggleSideBar(false);
                      miscellaneous(false);
+                     setSelectedChat(null);
                  }}>
                 <FontAwesomeIcon icon={faUser}/>
                 {!sideBarMinimized && <p>Profile</p>}

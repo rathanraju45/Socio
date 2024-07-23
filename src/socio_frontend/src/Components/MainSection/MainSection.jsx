@@ -30,9 +30,7 @@ import Feed from "../Feed/Feed.jsx";
  * @name MainSection
  * @returns {JSX.Element} The rendered JSX element
  */
-export default function MainSection({setLoading}) {
-
-    const [selectedChat, setSelectedChat] = useState(null); // The chat that is currently selected
+export default function MainSection({setLoading,selectedChat,setSelectedChat}) {
 
     // Access the sidebar minimized state from the global store
     const {sideBarMinimized} = useContext(GlobalStore);

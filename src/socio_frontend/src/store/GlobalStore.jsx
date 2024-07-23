@@ -1,17 +1,41 @@
-import {createContext, useEffect, useState} from 'react';
+import { createContext, useEffect, useState } from 'react';
 
 /**
- * GlobalStore - The context object for the global store.
+ * GlobalStore - A React context for managing global state across the application.
+ * Provides a centralized store for managing user authentication, UI preferences, and device information.
  * @type {React.Context}
  */
 
 export const GlobalStore = createContext();
 
 /**
- * GlobalStoreProvider - The provider component for the global store.
- * @param {Object} props - The props for the component.
- * @param {React.ReactNode} props.children - The children nodes of the provider.
- * @returns {React.Element} The provider element for the global store.
+ * GlobalStoreProvider - A provider component for the GlobalStore context.
+ * Wraps the application's component tree to provide global state access.
+ *
+ * Props:
+ * @param {Object} props - The component props.
+ * @param {React.ReactNode} props.children - The child components that will have access to the global store.
+ *
+ * State Variables:
+ * @state {boolean} loggedIn - Tracks whether a user is logged in. Default: false.
+ * @state {Object|null} actor - Represents the current user's actor model. Default: null.
+ * @state {Object|null} identity - Stores the current user's identity information. Default: null.
+ * @state {Object|null} userDetails - Contains detailed information about the logged-in user. Default: null.
+ * @state {Object|null} alert - Used to display alerts or notifications to the user. Default: null.
+ * @state {boolean} darkMode - Indicates whether dark mode is enabled. Default: false or retrieved from localStorage.
+ * @state {boolean} sideBarMinimized - Indicates whether the sidebar is minimized. Default: false.
+ * @state {string} deviceType - Represents the type of device (e.g., 'desktop', 'mobile', 'tablet'). Default: 'desktop'.
+ *
+ * Functions:
+ * @function toggleDarkMode - Toggles the dark mode setting.
+ * @function toggleSideBar - Toggles the sidebar minimized state.
+ * @function updateDeviceType - Updates the device type based on the window width.
+ *
+ * useEffect Hooks:
+ * - Persists the `darkMode` state to localStorage on change.
+ * - Adds a resize event listener on mount to update `deviceType` and removes it on unmount.
+ *
+ * @returns {React.Element} The provider element for the GlobalStore.
  */
 
 // eslint-disable-next-line react/prop-types

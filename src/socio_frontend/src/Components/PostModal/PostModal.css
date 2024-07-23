@@ -1,0 +1,234 @@
+#darkBG .post-modal-content{
+    box-shadow: 5px 5px 5px var(--socio-white);
+    background-color: var(--socio-black);
+    border: solid 1px var(--socio-white);
+}
+
+#lightBG .post-modal-content{
+    box-shadow: 5px 5px 5px var(--socio-black);
+    background-color: var(--socio-white);
+    border: var(--socio-black);
+}
+
+.post-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.post-modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 60%;
+    width: 90%;
+    display: flex;
+    position: relative;
+}
+
+.post-modal .close {
+    float: right;
+    font-size: 24px;
+    padding: 16px;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.post-modal-image{
+    width: 50%;
+    border-right: solid 1px;
+}
+
+.post-modal img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 1 / 1;
+}
+
+.post-details {
+    width: 50%;
+    padding: 16px;
+    font-size: 20px;
+}
+
+.post-details svg,.post-details span{
+    font-size: 24px;
+}
+
+.post-modal button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+.post-modal button:focus {
+    outline: none;
+}
+
+.post-modal .comments {
+    margin-top: 16px;
+    max-height: 250px;
+    overflow-y: auto;
+    height: 250px;
+}
+
+.no-comments{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.post-modal .comments p {
+    margin-bottom: 8px;
+}
+
+.post-modal form {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.post-modal input[type="text"] {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #dbdbdb;
+    border-radius: 6px;
+    margin-right: 8px;
+}
+
+.post-modal button[type="submit"] {
+    padding: 8px 16px;
+    background-color: #0095f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.post-modal button[type="submit"]:hover {
+    background-color: #0077cc;
+}
+
+.post-uploader {
+    display: flex;
+    align-items: center;
+}
+
+.post-uploader img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+    border: 2px solid transparent;
+    background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, red, purple);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    box-decoration-break: clone;
+    aspect-ratio: 1 / 1;
+}
+
+.post-uploader p {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.post-modal-caption {
+    min-height: 100px; /* Minimum height */
+    max-height: 100px; /* Fixed height */
+    overflow-y: auto; /* Enables scrolling */
+    margin-bottom: 10px; /* Spacing for the Read More button */
+}
+
+.post-modal-caption.expanded{
+    max-height: none;
+}
+
+.post-modal .read-more{
+    color: #3897f0;
+}
+
+.post-modal .post-reactions{
+    margin-top: 5px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.post-modal .save-post{
+    margin-left: auto;
+}
+
+.post-modal .upload-time{
+    color: grey !important;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 767px){
+    .post-modal-content {
+        max-width: 100%;
+        width: 100%;
+        height: 85%;
+        flex-direction: column;
+    }
+
+    .post-modal-image{
+        height: 40%;
+        border-right: none;
+        border-bottom: solid 1px;
+    }
+
+    .post-modal-image img{
+        height: 100%;
+        width: auto;
+        margin: auto;
+    }
+
+    .post-details{
+        height: 50%;
+        overflow: scroll;
+    }
+
+    .post-modal-image, .post-details {
+        width: 100%; /* Make image and details take full width on smaller screens */
+    }
+
+    .post-modal-caption, .post-details, .post-modal .comments, .post-modal form input[type="text"] {
+        font-size: 16px; /* Adjust font size for better readability on small screens */
+    }
+
+    .post-modal .comments {
+        max-height: 150px; /* Adjust comments section height */
+    }
+}
+
+/* Tablet styles */
+@media screen and (min-width: 768px) and (max-width: 1024px){
+
+    .post-modal-content {
+        max-width: 90%;
+        width: 100%;
+    }
+
+    .post-modal-image, .post-details {
+        width: 50%; /* Keep image and details side by side on tablets */
+    }
+
+    .post-modal-caption, .post-details, .post-modal .comments, .post-modal form input[type="text"] {
+        font-size: 18px; /* Slightly larger font size for tablets */
+    }
+
+    .post-modal .comments {
+        max-height: 200px; /* Slightly larger comments section for tablets */
+    }
+}

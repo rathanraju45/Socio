@@ -137,6 +137,16 @@
     border-bottom: 1px solid #ccc;
 }
 
+#chat-header img{
+    border: 3px solid transparent;
+    background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, red, purple);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    box-decoration-break: clone;
+    aspect-ratio: 1 / 1;
+}
+
 #chat-header > * {
     cursor: pointer;
 }
@@ -254,10 +264,8 @@
 #chat-input input {
     width: 100%;
     height: 100%;
-    padding: 10px;
     border-radius: 10px;
-    padding-left: 40px;
-    padding-right: 70px;
+    padding: 10px 70px 10px 40px;
 }
 
 #chat-input-icons {

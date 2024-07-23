@@ -9,7 +9,6 @@
 // Importing necessary libraries and components
 // eslint-disable-next-line no-unused-vars
 import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
-import chatData from "../../Constants/chatData.js";
 import './Chat.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
@@ -25,6 +24,8 @@ import {
 import {GlobalStore} from "../../store/GlobalStore.jsx";
 import useConvertChatProfiles from "../../hooks/useConvertChatProfiles.js";
 import chatIdGenerator from "../../Constants/chatIdGenerator.js";
+import useFetchMessages from "../../hooks/useFetchMessages.js";
+import calculateTimeAgo from "../../Constants/calculateTimeAgo.js";
 
 /**
  * The main Chat component
@@ -35,8 +36,9 @@ import chatIdGenerator from "../../Constants/chatIdGenerator.js";
 export default function Chat({selectedChat, setSelectedChat, setLoading}) {
 
     // Using the GlobalStore to get the deviceType
-    const {darkMode,deviceType, actor, userDetails} = useContext(GlobalStore);
+    const {setAlert,darkMode, deviceType, actor, userDetails} = useContext(GlobalStore);
     const {updatedChats, conversionOfChats} = useConvertChatProfiles();
+    const {fetchMessages} = useFetchMessages();
 
     // State variables
     const [searchTerm, setSearchTerm] = useState(''); // The search term to filter chats
@@ -44,6 +46,8 @@ export default function Chat({selectedChat, setSelectedChat, setLoading}) {
     const [chatsArray, setChatsArray] = useState(null); // The list of chats as an array
     const [messageInput, setMessageInput] = useState(''); // The message input
     const [currentChatId, setCurrentChatId] = useState(''); // The current chat id
+
+    const [messageSending, setMessageSending] = useState(false); // The message sending status
 
     // Use Effects
     // This effect is used to convert the chatData array into a dictionary with the chat name as the key
@@ -54,7 +58,7 @@ export default function Chat({selectedChat, setSelectedChat, setLoading}) {
                 const friendUsername = chatMembers.filter(member => member !== userDetails.username)[0];
                 setLoading("Loading chats...")
                 const profileDetails = await actor.getProfileDetails(friendUsername);
-                setLoading(null);
+                // setLoading(null);
                 let chatProfilePic = profileDetails["ok"].profilePicture;
                 let messages = await actor.getMessages(chatId);
                 return {friendUsername, chatProfilePic, messages};
@@ -78,6 +82,7 @@ export default function Chat({selectedChat, setSelectedChat, setLoading}) {
 
     useEffect(() => {
         if (updatedChats.length !== 0) {
+            setLoading(null);
             let chatDict = {};
             updatedChats.forEach(chat => {
                 chatDict[chat.friendUsername] = {
@@ -92,10 +97,15 @@ export default function Chat({selectedChat, setSelectedChat, setLoading}) {
     }, [updatedChats]);
 
     useEffect(() => {
-        if(selectedChat !== null){
+        if (selectedChat !== null) {
             setCurrentChatId(chatIdGenerator(userDetails.username, selectedChat.name));
+
+            const intervalId = setInterval(() => {
+                fetchMessages(chats, selectedChat, setChats, currentChatId);
+            }, 1000);
+            return () => clearInterval(intervalId);
         }
-    }, [selectedChat]);
+    }, [selectedChat,currentChatId]);
 
     // This ref is used to scroll to the bottom of the chat messages when a new message is sent
     const messagesEndRef = useRef(null);
@@ -115,35 +125,10 @@ export default function Chat({selectedChat, setSelectedChat, setLoading}) {
         ) : [];
     }, [searchTerm, chats]);
 
-    // This function is used to calculate the time ago for a given time
-    const calculateTimeAgo = useMemo(() => (time) => {
-
-        const currentTime = new Date();
-        const sentTime = new Date(time);
-        const differenceInMilliseconds = currentTime - sentTime;
-        const differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
-        const differenceInMinutes = Math.floor(differenceInSeconds / 60);
-        const differenceInHours = Math.floor(differenceInMinutes / 60);
-        const differenceInDays = Math.floor(differenceInHours / 24);
-
-        let timeAgo;
-        if (differenceInDays > 0) {
-            timeAgo = `${differenceInDays}d`;
-        } else if (differenceInHours > 0) {
-            timeAgo = `${differenceInHours}h`;
-        } else if (differenceInMinutes > 0) {
-            timeAgo = `${differenceInMinutes}m`;
-        } else {
-            timeAgo = `${differenceInSeconds}s`;
-        }
-
-        return timeAgo;
-    }, []);
-
     // This function is used to render a chat
     const renderChat = (chat, index) => {
         const lastMessage = chat.messages[0].messages[chat.messages[0].messages.length - 1];
-        const timeAgo = calculateTimeAgo(new Date(lastMessage.date));
+        const timeAgo = useMemo(() => calculateTimeAgo(new Date(lastMessage.date)), [lastMessage.date]);
         const isSelectedChat = selectedChat && chat.name === selectedChat.name;
 
         return (
@@ -167,7 +152,10 @@ export default function Chat({selectedChat, setSelectedChat, setLoading}) {
     // This function is used to handle the key press event when the user presses 'Enter' to send a message
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') {
-            sendMessage();
+            sendMessage().then((r) => {
+                if(r !== null) setMessageSending(false);
+                else setAlert({type: 'error', message: 'Failed to send message'});
+            });
             event.preventDefault(); // Prevents the addition of a new line in the input after pressing 'Enter'
         }
     };
@@ -184,22 +172,10 @@ export default function Chat({selectedChat, setSelectedChat, setLoading}) {
                 date: date, // current time
             };
 
-            // Find the chat where the message should be inserted
-            const chatToUpdate = chats[selectedChat.name];
-
-            // Insert the new message
-            chatToUpdate.messages[0].messages.push(newMessage);
-
-            // Update the chats state
-            setChats({
-                ...chats,
-                [selectedChat.name]: chatToUpdate,
-            });
-
             // Clear the input box
             setMessageInput('');
-
-            let resMessage = await actor.postMessage(currentChatId,userDetails.username,[messageInput],[],date);
+            setMessageSending(true);
+            return await actor.postMessage(currentChatId, userDetails.username, [messageInput], [], date);
         }
     };
 
@@ -233,11 +209,19 @@ export default function Chat({selectedChat, setSelectedChat, setLoading}) {
                             Object.values(chats).map((chat, index) => {
                                 if (chat.messages[0].messages.length !== 0) {
                                     return renderChat(chat, index)
+                                } else {
+                                    return <p id="no-chats">No chats</p>;
                                 }
                             })
                             : <p id="no-chats">No chats</p>
                     ) : (
-                        filteredChats.map(chat => renderChat(chat))
+                        filteredChats.map((chat, index) => {
+                            if (chat.messages[0].messages.length !== 0) {
+                                return renderChat(chat, index)
+                            } else {
+                                return <p id="no-chats">No chats</p>;
+                            }
+                        })
                     )}
                 </div>
 
@@ -266,6 +250,7 @@ export default function Chat({selectedChat, setSelectedChat, setLoading}) {
                                 </div>
                             </div>
                             <div id="messages-section">
+                                <div ref={messagesEndRef}/>
                                 {
                                     selectedChat.messages.map((messageGroup, groupIndex) =>
                                         messageGroup.messages.slice().reverse().map((message, messageIndex) => (
@@ -291,7 +276,6 @@ export default function Chat({selectedChat, setSelectedChat, setLoading}) {
                                         ))
                                     )
                                 }
-                                <div ref={messagesEndRef}/>
                             </div>
                             <div id="chat-input">
                                 <FontAwesomeIcon id={"emoji-icon"} icon={faFaceSmile}/>

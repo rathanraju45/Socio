@@ -9,7 +9,7 @@ export default function Notifications({miscellaneous,setLoading}) {
 
     const navigate = useNavigate();
 
-    const {actor, userDetails} = useContext(GlobalStore);
+    const {actor,toggleSideBar,userDetails} = useContext(GlobalStore);
     const [tempNotifications, setTempNotifications] = useState([]);
     const [notifications, setNotifications] = useState([]);
     const {updatedNotifications, convertNotifications} = useConvertNotificationProfiles();
@@ -17,6 +17,7 @@ export default function Notifications({miscellaneous,setLoading}) {
     useEffect(() => {
         if(updatedNotifications.length !== 0){
             setNotifications(updatedNotifications);
+            setLoading(null);
         }
     }, [updatedNotifications]);
 
@@ -30,7 +31,7 @@ export default function Notifications({miscellaneous,setLoading}) {
         const fetchNotifications = async () => {
             if (userDetails.notifications.length !== 0) {
                 let finalNotifications = [];
-                setLoading("Loading Notifications");
+                setLoading("Loading notifications...")
                 for (const notification of userDetails.notifications) {
                     let res = await actor.getProfileDetails(notification.from);
                     let notificationItem = {
@@ -43,7 +44,6 @@ export default function Notifications({miscellaneous,setLoading}) {
                     };
                     finalNotifications.push(notificationItem);
                 }
-                setLoading(null);
                 setTempNotifications(finalNotifications);
             }
         };
@@ -80,6 +80,7 @@ export default function Notifications({miscellaneous,setLoading}) {
                     <div key={index} className="notification-item" onClick={() => {
                         navigate(`/profile/${notification.from}`)
                         miscellaneous(false);
+                        toggleSideBar(false);
                     }}>
                         <img src={notification.profilePic} alt="user avatar" className="avatar"/>
                         <div className="notification-text">
